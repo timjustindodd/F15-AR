@@ -551,7 +551,7 @@ async function startAR(pre){
   qReady=false;
 }
 function grantFromFirstTap(){
-  document.removeEventListener('pointerdown',grantFromFirstTap,true);
+  if(grantFromFirstTap.done)return; grantFromFirstTap.done=true; document.removeEventListener('click',grantFromFirstTap,true); document.removeEventListener('touchend',grantFromFirstTap,true);
   $('start').hidden=true;
   // Motion permission, the camera, and play are started in this same tap.
   const permP=iosNeedsGesture()?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):null;
@@ -562,7 +562,8 @@ function grantFromFirstTap(){
 }
 function beginPhone(){
   $('start').hidden=false;
-  document.addEventListener('pointerdown',grantFromFirstTap,true);
+  // iOS only grants motion permission from a click/touchend (not pointerdown/touchstart).
+  document.addEventListener('click',grantFromFirstTap,true); document.addEventListener('touchend',grantFromFirstTap,true);
 }
 if(PHONE)beginPhone();
 
