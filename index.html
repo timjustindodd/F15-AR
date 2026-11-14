@@ -92,10 +92,13 @@
   .livebits div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(51,56,63,.6);padding:2px 0}
   .livebits span:first-child{color:var(--dim);font-family:var(--f-label);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
   #desk{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto;background:#16181c;font:800 clamp(28px,8vw,44px)/1.1 var(--f-label);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
-  #start{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:none;pointer-events:none;padding:6px 10px;border-radius:6px;background:rgba(22,24,28,.55);font:700 13px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--fg);white-space:nowrap}
+  #start{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:24px;pointer-events:none;background:rgba(8,10,14,.62);text-align:center}
+  #start span{display:block;max-width:16ch;font:800 clamp(32px,10vw,52px)/.95 "Barlow Condensed","Saira Semi Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 0 18px rgba(248,77,30,.55);animation:tapPulse 1.8s ease-in-out infinite}
+  @keyframes tapPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+  @media (prefers-reduced-motion:reduce){#start span{animation:none;opacity:1}}
   body.desk #desk{display:flex}
   body.desk #c,body.desk #ui,body.desk #video{display:none!important}
-  body.phone #start:not([hidden]){display:block}
+  body.phone #start:not([hidden]){display:flex}
   @media (max-width:560px){
     #tlabel{display:none}
     #wm{width:84px}
@@ -115,7 +118,7 @@
 <video id="video" playsinline muted autoplay></video>
 <canvas id="c"></canvas>
 <div id="desk">Open on your phone</div>
-<div id="start" hidden>Tap to start</div>
+<div id="start" hidden><span>Tap anywhere to start</span></div>
 <div id="ui">
   <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
   <div id="tape" aria-hidden="true">
@@ -150,7 +153,7 @@
     </ul>
     <h4>Limits</h4>
     <ul>
-      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. Camera, motion, and location are requested as soon as the page loads. On iPhone, the first tap anywhere allows motion and the camera. There is no AR button.</li>
+      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. The first tap anywhere starts the camera, motion, and location. On iPhone that tap is what allows motion. There is no AR button.</li>
       <li>iPhone Safari has no WebXR AR, so on iOS this uses camera passthrough + compass (iOS 13+ asks for Motion permission). Android Chrome uses WebXR <code>immersive-ar</code> when supported.</li>
       <li>Compass accuracy varies. On iPhone, heading is <code>webkitCompassHeading</code> (magnetic) plus declination. If accuracy is below 0 or worse than 20°, calibrate with a figure-8. Point the reticle at the real Pad 1 tower and tap <b>Align to tower</b>. The offset is saved on this phone.</li>
       <li>Declination is a south-Texas constant of <b>+2.5° E</b> (true = magnetic + east declination), not a full World Magnetic Model run. Edit it if you are somewhere else. It is applied only to the magnetic compass, not to <code>deviceorientationabsolute</code>.</li>
@@ -542,17 +545,16 @@ async function startAR(pre){
 function grantFromFirstTap(){
   document.removeEventListener('pointerdown',grantFromFirstTap,true);
   $('start').hidden=true;
-  // Permission, camera, and play must be kicked off in this same tap.
-  const permP=DeviceOrientationEvent.requestPermission().catch(()=>'denied');
+  // Motion permission, the camera, and play are started in this same tap.
+  const permP=iosNeedsGesture()?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):null;
   let camP; try{camP=cameraPromise();}catch(e){camP=Promise.reject(e);}
   camP.then(stream=>{video.srcObject=stream;video.style.display='block';const p=video.play();if(p)p.catch(()=>{});}).catch(()=>{});
   startGps();
   startAR({permP,camP});
 }
 function beginPhone(){
-  startGps();
-  if(iosNeedsGesture()){$('start').hidden=false;document.addEventListener('pointerdown',grantFromFirstTap,true);return;}
-  startAR(null);
+  $('start').hidden=false;
+  document.addEventListener('pointerdown',grantFromFirstTap,true);
 }
 if(PHONE)beginPhone();
 
