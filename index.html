@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Starship Flight 15 – Ship Return &amp; Catch (APPROXIMATE) – 3D / AR</title>
+<title>Starship Flight 15 – Ship Return &amp; Catch (StarDash sim) – 3D / AR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Saira+Semi+Condensed:wght@500;600;700&family=Share+Tech+Mono&display=swap">
@@ -91,8 +91,8 @@
 <div id="ui">
   <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
   <div id="top">
-    <div id="title" class="panel p"><b>Starship Flight 15 · Ship return &amp; catch</b><span class="badge" id="approxBadge">APPROXIMATE</span>
-      <small>Path reconstructed from SpaceX's published corridor description + timeline. Tap ⓘ for sources &amp; limits.</small></div>
+    <div id="title" class="panel p"><b>Starship Flight 15 · Ship return &amp; catch</b><span class="badge" id="approxBadge">STAR DASH SIM</span>
+      <small>Path from the StarDash Flight 15 simulation (SpaceX timeline + Flight 14 entry + physics), not live return telemetry. Tap ⓘ for sources &amp; limits.</small></div>
     <div id="readout" class="panel p">
       <div id="phase">—</div>
       <div><span>To catch</span><span class="big" id="rT">—</span></div>
@@ -107,12 +107,12 @@
   <div id="arrow"></div>
   <div id="info" class="panel p">
     <h3>Flight 15 ship return – what you're looking at</h3>
-    <p><b>The path is APPROXIMATE.</b> SpaceX has not published coordinates for the return ground track. This is a reconstruction, not telemetry.</p>
+    <p><b>The path is a simulation, not live return telemetry.</b> Coordinates come from the StarDash Flight 15 simulation (<a href="https://stardash.live/" target="_blank">stardash.live</a>), which StarDash describes as built from SpaceX's Flight 15 mission video and published timeline, the recorded entry of Flight 14, and physics. When this copy was checked (late morning CT, Sat Nov 14), Ship 42 was still in orbit; the return and catch had not happened yet.</p>
     <h4>What it's based on</h4>
     <ul>
-      <li><b>Approach direction</b> – SpaceX, "Returning Starship to the Launch Site" (Nov 7, 2026): Starship reenters over the Pacific, flies over sparsely populated northern Mexico and southern Texas, "approaches Starbase from the west", weaves around the Rio Grande Valley cities, <b>passes north of South Padre Island and out over the Gulf</b>, then makes a final turn south toward Starbase, bellyflops toward the Pad 2 tower, lights 3 Raptors, flips, and is caught. <a href="https://www.spacex.com/updates/" target="_blank">spacex.com/updates</a></li>
-      <li><b>Timeline</b> – <a href="https://www.spacex.com/launches/starship-flight-15" target="_blank">spacex.com/launches/starship-flight-15</a>: entry T+22:10:46, transonic T+22:29:34, subsonic T+22:30:13, landing burn T+22:32:16, flip T+22:32:18, 3→2 engines T+22:32:26, 2→1 T+22:32:33, catch T+22:32:34. Liftoff was 4:47:36 PM CT Nov 13, so the default catch time is <b>3:20:10 PM CT, Sat Nov 14</b> (editable below).</li>
-      <li><b>Altitude/speed anchors</b> – Flight 14 webcast telemetry: transonic at ~20 km and ~1,062 km/h, "subsonic" callout at ~16 km. Everything else (the hypersonic part, the exact turn, the bellyflop glide) is an engineering guess with smooth interpolation.</li>
+      <li><b>Ground track, altitude, and speed</b> – StarDash <code>F15_SIM</code> at 1 Hz, catch at T+22:32:34 on Pad 2 (25.9968 N, 97.1580 W). In this 12-minute window the ship is still over the Pacific at the start (about 1,956 km from the pad, still below the Outpost horizon), crosses northern Mexico and south Texas, passes north of South Padre and a few kilometres out over the Gulf, then turns south to the tower. It rises above the Outpost horizon at T+22:24:06. <a href="https://stardash.live/" target="_blank">stardash.live</a></li>
+      <li><b>Approach description</b> – SpaceX, "Returning Starship to the Launch Site" (Nov 7, 2026): reentry over the Pacific, over sparsely populated northern Mexico and southern Texas, north of South Padre Island and out over the Gulf, then a final turn south to the Pad 2 tower. The simulation follows that corridor, but farther north than a hand-drawn path near Monterrey would. <a href="https://www.spacex.com/updates/" target="_blank">spacex.com/updates</a></li>
+      <li><b>Timeline</b> – StarDash's Flight 15 event list matches <a href="https://www.spacex.com/launches/starship-flight-15" target="_blank">SpaceX's published times</a>: deorbit T+21:35:57–T+21:36:07, entry T+22:10:46, transonic T+22:29:34, subsonic T+22:30:13, landing burn T+22:32:16, flip T+22:32:18, 3→2 engines T+22:32:26, 2→1 T+22:32:33, catch T+22:32:34. Liftoff was 4:47:36 PM CT Nov 13 (confirmed by the live feed's T-0), so the default catch time is <b>3:20:10 PM CT, Sat Nov 14</b> (editable below). In the simulation the 100 km interface is T+22:06:37, and Mach 1 (ISA, ground speed) is about T+22:29:56 at 20.7 km, 22 seconds after the official transonic callout.</li>
       <li><b>Map</b> – Gulf/South Padre coastline and Rio Grande from OpenStreetMap (simplified); the Laguna Madre mainland shore is hand-approximated.</li>
       <li><b>Rocket Ranch Outpost</b> – approximate: placed on the Rio Grande 3.7 mi (Rocket Ranch's own straight-line figure) from the tower, ~25.958 N, 97.197 W. The campground (43742 Palmito Hill Rd) is ~25.947 N, 97.279 W.</li>
     </ul>
@@ -178,14 +178,46 @@ const SITES = {
 // Mainland Laguna Madre shore (hand-approximated) from Port Isabel north
 const LAGUNA_SHORE = [[26.0643,-97.1499],[26.058,-97.165],[26.040,-97.180],[26.030,-97.200],[26.045,-97.215],[26.062,-97.212],[26.075,-97.207],[26.090,-97.222],[26.130,-97.258],[26.200,-97.292],[26.300,-97.340],[26.400,-97.380],[26.500,-97.415],[26.600,-97.430],[26.800,-97.465],[27.200,-97.450]];
 // Approximate route (far west -> tower), lat/lon. Shape follows SpaceX's description.
-const ROUTE = [[25.38,-104.95],[25.50,-104.20],[25.95,-101.50],[26.35,-100.20],[26.55,-99.30],[26.48,-98.50],[26.42,-97.95],[26.33,-97.45],[26.30,-97.18],[26.27,-97.08],[26.19,-97.04],[26.10,-97.05],[26.03,-97.10],[26.0045,-97.142],[25.9972,-97.1566]];
-// Profile keyframes: t (s relative to catch), altitude km, horizontal speed m/s
-const PROFILE = [[-720,72,2900],[-600,60,2250],[-480,49,1600],[-390,41,1150],[-300,33,780],[-240,27.5,520],
- [-180,20.0,270],[-141,16.0,230],[-100,11.0,150],[-60,5.8,95],[-30,2.3,70],[-18,1.0,55],[-16,0.85,40],
- [-8,0.32,12],[-1,0.13,2],[0,0.10,0]];
+const ROUTE = [
+  [30.080121,-116.57128],[30.034918,-114.730923],[29.952397,-112.942798],[29.833709,-111.213752],
+  [29.680115,-109.550579],[29.496748,-107.964941],[29.287055,-106.464808],[29.060696,-105.06084],
+  [28.825873,-103.763099],[28.581102,-102.564005],[28.319482,-101.464705],[28.03786,-100.475],
+  [27.739518,-99.609136],[27.431692,-98.873572],[27.124376,-98.27003],[26.829637,-97.797298],
+  [26.560628,-97.451626],[26.47897,-97.363316],[26.402258,-97.287953],[26.330831,-97.225842],
+  [26.264713,-97.17719],[26.204639,-97.142441],[26.15258,-97.121709],[26.110114,-97.113565],
+  [26.077954,-97.115015],[26.055448,-97.120924],[26.041858,-97.126521],[26.040661,-97.127118],
+  [26.031286,-97.132648],[26.025294,-97.137332],[26.021407,-97.141516],[26.018846,-97.145285],
+  [26.016849,-97.148745],[26.015912,-97.15037],[26.014988,-97.151937],[26.014066,-97.153457],
+  [26.013138,-97.154959],[26.012211,-97.156448],[26.01129,-97.157912],[26.010322,-97.159236],
+  [26.009208,-97.160223],[26.007858,-97.160685],[26.006324,-97.16063],[26.004775,-97.160274],
+  [26.003373,-97.159837],[26.002115,-97.159412],[26.000874,-97.158991],[26.000616,-97.158906],
+  [26.000353,-97.158821],[26.000042,-97.158729],[25.999643,-97.158623],[25.999155,-97.158505],
+  [25.998657,-97.158393],[25.998226,-97.158302],[25.997864,-97.158228],[25.997571,-97.15817],
+  [25.997346,-97.158126],[25.997191,-97.158097],[25.997055,-97.158071],[25.996932,-97.158048],
+  [25.996836,-97.158031]
+];
+// Ground track & profile from the StarDash Flight 15 simulation (F15_SIM, 1 Hz),
+// https://stardash.live/assets/flight15_sim-B0jlWEHE-r2.js — a simulation built from
+// SpaceX's Flight 15 mission video and published timeline, Flight 14's recorded entry, and physics.
+// Not live return telemetry (the return had not happened when this was checked).
+// PROFILE: t (s relative to catch), altitude km, horizontal ground speed m/s.
+const PROFILE = [
+  [-720,65.534,5979.9],[-690,64.553,5830.4],[-660,63.349,5662.9],[-630,62.017,5482.2],[-600,60.513,5274.4],[-570,58.871,5034.3],
+  [-540,57.411,4772.0],[-510,56.119,4461.7],[-480,54.551,4141.7],[-450,52.532,3861.0],[-420,50.271,3560.4],[-390,47.851,3227.3],
+  [-360,45.488,2860.1],[-330,43.246,2484.5],[-300,40.808,2098.2],[-270,38.043,1713.8],[-240,34.775,1326.7],[-230,33.627,1200.4],
+  [-220,32.496,1071.4],[-210,31.255,943.5],[-200,29.783,818.5],[-190,27.984,685.3],[-180,25.79,546.0],[-170,23.378,416.9],
+  [-160,21.128,304.4],[-150,19.108,212.8],[-141,17.406,148.9],[-140,17.221,143.0],[-130,15.405,96.6],[-120,13.666,69.2],
+  [-110,12.023,52.4],[-100,10.465,43.5],[-90,8.996,39.3],[-85,8.299,38.0],[-80,7.626,37.0],[-75,6.978,36.5],
+  [-70,6.356,36.4],[-65,5.756,36.0],[-60,5.176,35.2],[-55,4.614,32.9],[-50,4.068,31.0],[-45,3.534,32.8],
+  [-40,3.013,35.2],[-35,2.501,34.4],[-30,1.998,30.4],[-25,1.503,28.6],[-20,1.02,29.6],[-19,0.925,30.2],
+  [-18,0.831,33.1],[-17,0.736,40.7],[-16,0.638,50.6],[-15,0.542,56.0],[-14,0.452,52.6],[-13,0.372,44.9],
+  [-12,0.307,37.0],[-11,0.255,29.2],[-10,0.214,21.4],[-9,0.184,13.6],[-8,0.163,7.7],[-7,0.147,5.3],
+  [-6,0.133,4.9],[-5,0.121,4.4],[-4,0.111,3.9],[-3,0.104,3.4],[-2,0.099,2.9],[-1,0.098,2.0],
+  [0,0.097,0.0]
+];
 const EVENTS = [
-  {t:-180, name:'Transonic (T+22:29:34) ~20 km'},
-  {t:-141, name:'Subsonic (T+22:30:13) ~16 km'},
+  {t:-180, name:'Transonic callout (T+22:29:34)'},
+  {t:-141, name:'Subsonic callout (T+22:30:13)'},
   {t:-18,  name:'Landing burn + flip (T+22:32:16)'},
   {t:0,    name:'CATCH (T+22:32:34)'},
 ];
