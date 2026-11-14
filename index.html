@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Starship Flight 15 – Ship Return &amp; Catch (APPROXIMATE) – 3D / AR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Saira+Semi+Condensed:wght@500;600;700&family=Share+Tech+Mono&display=swap">
+<style>
+  /* Propulsive / Everyday Astronaut: flat charcoal, brand orange #F84D1E, Barlow Condensed + Share Tech Mono.
+     Watermark matches the game's #wm: Everyday Astronaut logo, top left, 132px, opacity .62. */
+  :root{
+    --bg:rgba(31,34,39,.92);
+    --fg:#ecebe6;
+    --dim:#9aa1aa;
+    --acc:#F84D1E;
+    --line:#33383f;
+    --panel2:#262a30;
+    --ink:#1a0a04;
+    --f-label:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+    --f-head:"Saira Semi Condensed","Barlow Condensed",system-ui,sans-serif;
+    --f-num:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#16181c;color:var(--fg);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+  #video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:0}
+  #c{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
+  #ui{position:fixed;inset:0;z-index:2;pointer-events:none}
+  #ui .p{pointer-events:auto}
+  #wm{position:fixed;z-index:3;top:calc(env(safe-area-inset-top,0px) + 14px);left:max(16px,env(safe-area-inset-left,0px));width:132px;height:auto;opacity:.62;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+  .panel{background:var(--bg);border:1px solid var(--line);border-radius:10px}
+  #top{position:absolute;left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));display:flex;gap:8px;align-items:flex-start;justify-content:space-between;padding-top:40px}
+  #title{padding:8px 12px}
+  #title b{font-family:var(--f-label);font-weight:800;font-size:18px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+  .badge{display:inline-block;background:var(--acc);color:#fff;font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:2px 7px 1px;border-radius:4px;margin-left:8px;cursor:pointer;vertical-align:2px}
+  #title small{display:block;color:var(--dim);font-size:12px;margin-top:4px;letter-spacing:.01em;text-transform:none;font-weight:400}
+  #readout{padding:8px 12px;min-width:210px;font-family:var(--f-num);font-variant-numeric:tabular-nums}
+  #readout div{display:flex;justify-content:space-between;gap:12px}
+  #readout span:first-child{color:var(--dim);font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  #readout span:last-child{white-space:nowrap}
+  #readout .big{font-size:18px;font-weight:400;color:var(--acc)}
+  #phase{font-family:var(--f-label);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;text-align:center;margin-bottom:4px;color:var(--fg)}
+  #bottom{position:absolute;left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));bottom:calc(8px + env(safe-area-inset-bottom));padding:8px;display:flex;flex-direction:column;gap:6px}
+  .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  button{background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font:700 15px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:38px}
+  button.on{background:var(--acc);color:var(--ink);border-color:var(--acc)}
+  button:active{transform:scale(.97)}
+  #scrub{flex:1;min-width:140px;accent-color:var(--acc);height:30px}
+  #tlabel{font-family:var(--f-num);font-variant-numeric:tabular-nums;min-width:118px;text-align:right;color:var(--dim);font-size:12px}
+  #legend{display:flex;align-items:center;gap:6px;font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  #legend i{display:inline-block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,#29d3ff,#4dff88 30%,#ffe14d 45%,#ff8c1a 65%,#ff2d55 85%,#d14dff)}
+  #info{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,92vw);max-height:80vh;overflow:auto;padding:16px 18px;display:none;-webkit-user-select:text;user-select:text}
+  #info h3,#info h4{font-family:var(--f-head);font-weight:700;letter-spacing:.02em}
+  #info h3{margin:.2em 0 .4em;color:var(--acc);font-size:22px}
+  #info h4{margin:.8em 0 .2em;font-size:16px;text-transform:uppercase;letter-spacing:.08em}
+  #info p,#info li{color:#c9c6be;font-size:14px;line-height:1.5}
+  #info a{color:var(--acc)}
+  #info label{display:block;margin:.5em 0;font-family:var(--f-label);font-weight:600;font-size:14px;letter-spacing:.02em;color:var(--dim)}
+  #info input[type=text],#info input[type=number]{background:#121418;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none;width:min(220px,70vw)}
+  #info input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #F84D1E33}
+  #msg{position:absolute;left:50%;top:calc(78px + env(safe-area-inset-top));transform:translateX(-50%);padding:8px 12px;display:none;max-width:90vw;text-align:center;font-family:var(--f-label);font-weight:600;letter-spacing:.04em}
+  #arrow{position:absolute;width:0;height:0;display:none;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:26px solid var(--acc);filter:drop-shadow(0 0 4px #000);transform-origin:50% 60%}
+  #arbar{display:none}
+  body.ar #arbar{display:flex}
+  body.ar .noar{display:none!important}
+  #hdgTxt{font-family:var(--f-num)!important;letter-spacing:0!important;text-transform:none!important}
+  @media (max-width:560px){
+    #wm{width:100px}
+    #top{flex-direction:column;align-items:stretch;padding-top:46px}
+    #title small{display:none}
+    #title b{font-size:15px}
+    #readout{min-width:0;font-size:11px;display:grid;grid-template-columns:1fr 1fr;column-gap:8px}
+    #readout #phase{grid-column:1/3}
+    #readout .big{font-size:15px}
+    #readout span:first-child{font-size:11px}
+    #legend i{width:80px}
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<video id="video" playsinline muted autoplay></video>
+<canvas id="c"></canvas>
+<div id="ui">
+  <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
+  <div id="top">
+    <div id="title" class="panel p"><b>Starship Flight 15 · Ship return &amp; catch</b><span class="badge" id="approxBadge">APPROXIMATE</span>
+      <small>Path reconstructed from SpaceX's published corridor description + timeline. Tap ⓘ for sources &amp; limits.</small></div>
+    <div id="readout" class="panel p">
+      <div id="phase">—</div>
+      <div><span>To catch</span><span class="big" id="rT">—</span></div>
+      <div><span>Clock (CT)</span><span id="rClock">—</span></div>
+      <div><span>Altitude</span><span id="rAlt">—</span></div>
+      <div><span>Speed</span><span id="rSpd">—</span></div>
+      <div><span>Look (az / el)</span><span id="rAzEl">—</span></div>
+      <div><span>Range</span><span id="rRng">—</span></div>
+    </div>
+  </div>
+  <div id="msg" class="panel"></div>
+  <div id="arrow"></div>
+  <div id="info" class="panel p">
+    <h3>Flight 15 ship return – what you're looking at</h3>
+    <p><b>The path is APPROXIMATE.</b> SpaceX has not published coordinates for the return ground track. This is a reconstruction, not telemetry.</p>
+    <h4>What it's based on</h4>
+    <ul>
+      <li><b>Approach direction</b> – SpaceX, "Returning Starship to the Launch Site" (Nov 7, 2026): Starship reenters over the Pacific, flies over sparsely populated northern Mexico and southern Texas, "approaches Starbase from the west", weaves around the Rio Grande Valley cities, <b>passes north of South Padre Island and out over the Gulf</b>, then makes a final turn south toward Starbase, bellyflops toward the Pad 2 tower, lights 3 Raptors, flips, and is caught. <a href="https://www.spacex.com/updates/" target="_blank">spacex.com/updates</a></li>
+      <li><b>Timeline</b> – <a href="https://www.spacex.com/launches/starship-flight-15" target="_blank">spacex.com/launches/starship-flight-15</a>: entry T+22:10:46, transonic T+22:29:34, subsonic T+22:30:13, landing burn T+22:32:16, flip T+22:32:18, 3→2 engines T+22:32:26, 2→1 T+22:32:33, catch T+22:32:34. Liftoff was 4:47:36 PM CT Nov 13, so the default catch time is <b>3:20:10 PM CT, Sat Nov 14</b> (editable below).</li>
+      <li><b>Altitude/speed anchors</b> – Flight 14 webcast telemetry: transonic at ~20 km and ~1,062 km/h, "subsonic" callout at ~16 km. Everything else (the hypersonic part, the exact turn, the bellyflop glide) is an engineering guess with smooth interpolation.</li>
+      <li><b>Map</b> – Gulf/South Padre coastline and Rio Grande from OpenStreetMap (simplified); the Laguna Madre mainland shore is hand-approximated.</li>
+      <li><b>Rocket Ranch Outpost</b> – approximate: placed on the Rio Grande 3.7 mi (Rocket Ranch's own straight-line figure) from the tower, ~25.958 N, 97.197 W. The campground (43742 Palmito Hill Rd) is ~25.947 N, 97.279 W.</li>
+    </ul>
+    <h4>Limits</h4>
+    <ul>
+      <li>Camera + motion sensors need <b>HTTPS</b> (or localhost). Opened as a file:// page, only the 3D view works.</li>
+      <li>iPhone Safari has no WebXR AR, so on iOS this uses camera passthrough + compass (iOS 13+ asks for Motion permission). Android Chrome uses WebXR <code>immersive-ar</code> when supported.</li>
+      <li>Compass accuracy varies (±5–15° is normal; metal and cars make it worse). Point at the Starbase tower and tap <b>Align to tower</b> to fix heading. Elevation (tilt) is more reliable than heading.</li>
+      <li>Phone camera field of view varies; adjust FOV if the tower/horizon don't line up.</li>
+      <li>Earth curvature is included in az/el; atmospheric refraction is not.</li>
+    </ul>
+    <h4>Settings</h4>
+    <label>Catch time (CT, edit if it slips): <input type="text" id="catchInput" value="2026-11-14 15:20:10"></label>
+    <label>Viewer: <button id="btnGPS">Use my GPS location</button> <button id="btnRRO">Reset to Rocket Ranch Outpost</button> <span id="viewerTxt"></span></label>
+    <label>AR camera field of view (long side, °): <input type="number" id="fovInput" value="67" min="30" max="110" step="1"></label>
+    <label>Magnetic declination (°E): <input type="number" id="declInput" value="2.2" step="0.1"></label>
+    <p><button id="btnCloseInfo">Close</button></p>
+  </div>
+  <div id="bottom" class="panel p">
+    <div class="row">
+      <button id="btnPlay">▶︎ Play</button>
+      <button id="btnRate">1×</button>
+      <input id="scrub" type="range" min="-720" max="30" step="0.5" value="-200">
+      <span id="tlabel">—</span>
+    </div>
+    <div class="row">
+      <button id="btnLive">Live</button>
+      <button id="btnAR">AR</button>
+      <button id="btnReset" class="noar">Reset view</button>
+      <button id="btnFull" class="noar">Whole path</button>
+      <button id="btnInfo">ⓘ</button>
+      <span id="legend" class="noar"><span>slow</span><i></i><span>Mach 10+</span></span>
+    </div>
+    <div class="row" id="arbar">
+      <button id="btnAlign">Align to tower</button>
+      <button id="btnL">⟲ 2°</button>
+      <button id="btnR">2° ⟳</button>
+      <span id="hdgTxt" style="font-size:12px;color:var(--dim)"></span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+// ---------------------------------------------------------------- data
+const GEO = {"river":[[26.0131,-97.6384],[26.0122,-97.6444],[26.0067,-97.645],[26.0038,-97.6395],[26.0,-97.6351],[26.005,-97.6307],[25.9994,-97.6278],[25.9993,-97.6214],[25.9943,-97.6188],[25.9943,-97.6248],[25.9966,-97.6305],[25.9919,-97.6345],[25.988,-97.6302],[25.9896,-97.6238],[25.9847,-97.6202],[25.9792,-97.6167],[25.9778,-97.6105],[25.9723,-97.6078],[25.967,-97.6105],[25.9625,-97.6064],[25.9582,-97.6026],[25.9594,-97.5966],[25.962,-97.5911],[25.9619,-97.5851],[25.9562,-97.5831],[25.9508,-97.5813],[25.9455,-97.5801],[25.9439,-97.5742],[25.9498,-97.5731],[25.9518,-97.5675],[25.9461,-97.5659],[25.9435,-97.5714],[25.9409,-97.5775],[25.9381,-97.5827],[25.9327,-97.5824],[25.9345,-97.5766],[25.9343,-97.5705],[25.9295,-97.5677],[25.9257,-97.5633],[25.9304,-97.5595],[25.9359,-97.5573],[25.9369,-97.5513],[25.9338,-97.546],[25.9277,-97.5452],[25.929,-97.5391],[25.9234,-97.5411],[25.9201,-97.5362],[25.9199,-97.5301],[25.9142,-97.5322],[25.9088,-97.5333],[25.9059,-97.5282],[25.9007,-97.5255],[25.8958,-97.5229],[25.8902,-97.5235],[25.886,-97.5198],[25.8874,-97.5137],[25.8895,-97.5078],[25.8934,-97.5032],[25.8982,-97.4994],[25.8931,-97.4965],[25.8878,-97.4976],[25.8823,-97.4975],[25.882,-97.4914],[25.8784,-97.4863],[25.8805,-97.4807],[25.8842,-97.4756],[25.8885,-97.4708],[25.8834,-97.4688],[25.8803,-97.4741],[25.8753,-97.4715],[25.879,-97.4668],[25.8829,-97.4621],[25.8842,-97.4559],[25.8789,-97.4548],[25.8728,-97.456],[25.8673,-97.4555],[25.8711,-97.4509],[25.869,-97.4454],[25.8638,-97.4472],[25.859,-97.4503],[25.8543,-97.4541],[25.856,-97.4484],[25.8509,-97.4458],[25.8483,-97.4404],[25.8483,-97.4342],[25.8438,-97.4297],[25.8404,-97.4244],[25.8409,-97.4181],[25.8418,-97.4122],[25.8469,-97.4145],[25.853,-97.4137],[25.8587,-97.4133],[25.8621,-97.4086],[25.8564,-97.4087],[25.8511,-97.4103],[25.8453,-97.408],[25.85,-97.4044],[25.8452,-97.4008],[25.8402,-97.4033],[25.8382,-97.3975],[25.8383,-97.3912],[25.8433,-97.3879],[25.8398,-97.3824],[25.8404,-97.3761],[25.8452,-97.3721],[25.8504,-97.3699],[25.8504,-97.3639],[25.8543,-97.3683],[25.854,-97.3744],[25.8578,-97.3699],[25.8631,-97.3666],[25.8675,-97.3631],[25.8667,-97.3571],[25.8723,-97.3593],[25.878,-97.3585],[25.8778,-97.3648],[25.8782,-97.3719],[25.8835,-97.3699],[25.8858,-97.3643],[25.8862,-97.3582],[25.8897,-97.363],[25.8935,-97.3674],[25.8989,-97.3663],[25.9039,-97.3694],[25.9065,-97.375],[25.909,-97.3693],[25.9146,-97.3693],[25.9157,-97.3629],[25.9182,-97.3572],[25.9218,-97.3526],[25.9267,-97.3496],[25.9292,-97.3442],[25.9298,-97.3375],[25.9242,-97.3375],[25.9226,-97.3318],[25.9177,-97.3289],[25.9225,-97.3252],[25.9277,-97.3225],[25.9313,-97.318],[25.9298,-97.3122],[25.9268,-97.307],[25.9321,-97.3044],[25.9375,-97.3025],[25.9336,-97.2974],[25.9365,-97.2915],[25.936,-97.2847],[25.935,-97.2787],[25.9409,-97.2778],[25.9459,-97.2801],[25.9495,-97.2849],[25.9536,-97.2893],[25.9588,-97.2855],[25.9557,-97.2805],[25.952,-97.276],[25.9516,-97.2685],[25.9512,-97.2622],[25.9494,-97.2558],[25.9484,-97.2498],[25.9516,-97.2446],[25.9556,-97.2392],[25.9569,-97.2329],[25.9593,-97.2274],[25.9571,-97.2213],[25.9596,-97.2151],[25.9632,-97.2102],[25.9589,-97.2059],[25.9584,-97.1999],[25.9558,-97.1941],[25.9539,-97.1884],[25.9594,-97.1856],[25.9611,-97.179],[25.9659,-97.176],[25.9619,-97.1711],[25.9602,-97.1653],[25.9622,-97.1595],[25.9556,-97.1589],[25.9503,-97.1603],[25.9501,-97.1543],[25.9531,-97.1488],[25.9563,-97.1474]],"gulf":[[25.7978,-97.1559],[25.8212,-97.1522],[25.8264,-97.1515],[25.8333,-97.1506],[25.848,-97.149],[25.8594,-97.1477],[25.8635,-97.1473],[25.8671,-97.1469],[25.8709,-97.1466],[25.8755,-97.1463],[25.8801,-97.1459],[25.884,-97.1457],[25.8884,-97.1454],[25.8927,-97.1453],[25.8969,-97.1453],[25.9019,-97.1451],[25.9057,-97.145],[25.9093,-97.145],[25.913,-97.145],[25.917,-97.1451],[25.9211,-97.1452],[25.9253,-97.1453],[25.9298,-97.1454],[25.9341,-97.1456],[25.9382,-97.1457],[25.942,-97.1459],[25.9476,-97.1462],[25.9522,-97.1467],[25.9563,-97.1474],[25.9602,-97.1473],[25.9659,-97.1478],[25.9695,-97.1481],[25.9736,-97.1482],[25.9776,-97.1487],[25.9851,-97.1494],[25.992,-97.1501],[25.9975,-97.1505],[26.0013,-97.1507],[26.0071,-97.1512],[26.0114,-97.1516],[26.0187,-97.1522],[26.0238,-97.1524],[26.029,-97.1526],[26.034,-97.1528],[26.039,-97.1529],[26.0444,-97.1528],[26.0489,-97.1527],[26.0527,-97.1524],[26.0571,-97.1519],[26.0608,-97.151],[26.0643,-97.1499],[26.0675,-97.1543]],"spi":[[26.0675,-97.1543],[26.073,-97.1562],[26.0804,-97.1583],[26.0859,-97.1597],[26.092,-97.161],[26.101,-97.1626],[26.1115,-97.1641],[26.1224,-97.166],[26.1292,-97.1671],[26.1358,-97.168],[26.1413,-97.1688],[26.1592,-97.1713],[26.1646,-97.172],[26.1736,-97.1734],[26.1821,-97.1744],[26.1946,-97.1759],[26.2102,-97.178],[26.2158,-97.179],[26.2258,-97.1808],[26.2392,-97.1831],[26.2648,-97.1884],[26.2704,-97.1895],[26.2847,-97.1928],[26.2938,-97.1948],[26.3026,-97.1967],[26.3087,-97.1981],[26.3164,-97.2],[26.3228,-97.2016],[26.3311,-97.2037],[26.3392,-97.2058],[26.3508,-97.2089],[26.3562,-97.2104],[26.3686,-97.2137],[26.3762,-97.2156],[26.3826,-97.2172],[26.3901,-97.2195],[26.3956,-97.221],[26.4067,-97.2239],[26.4122,-97.2254],[26.4232,-97.2284],[26.4444,-97.2353],[26.4562,-97.2391],[26.4681,-97.2427],[26.4748,-97.2451],[26.4805,-97.2469],[26.4868,-97.2492],[26.4977,-97.2525],[26.5077,-97.2556],[26.52,-97.2596],[26.527,-97.2617],[26.5459,-97.2677],[26.5545,-97.2697],[26.5613,-97.2704],[26.5622,-97.276]]};
+const SITES = {
+  rro:     {lat:25.9580, lon:-97.1970, name:'Rocket Ranch Outpost (approx.)', color:'#ffb347'},
+  tower:   {lat:25.9972, lon:-97.1566, name:'Starbase tower · CATCH', color:'#ff5a36'},
+  spi:     {lat:26.1100, lon:-97.1680, name:'South Padre Island', color:'#9fe3ff'},
+  pi:      {lat:26.0730, lon:-97.2080, name:'Port Isabel', color:'#9fe3ff'},
+  boca:    {lat:25.9640, lon:-97.1480, name:'Boca Chica Beach', color:'#f3e2a9'},
+  bro:     {lat:25.9017, lon:-97.4975, name:'Brownsville', color:'#c8d2e8'},
+  hrl:     {lat:26.1906, lon:-97.6961, name:'Harlingen', color:'#c8d2e8'},
+  mfe:     {lat:26.2034, lon:-98.2300, name:'McAllen', color:'#c8d2e8'},
+  mty:     {lat:25.6866, lon:-100.3161, name:'Monterrey', color:'#c8d2e8'},
+};
+// Mainland Laguna Madre shore (hand-approximated) from Port Isabel north
+const LAGUNA_SHORE = [[26.0643,-97.1499],[26.058,-97.165],[26.040,-97.180],[26.030,-97.200],[26.045,-97.215],[26.062,-97.212],[26.075,-97.207],[26.090,-97.222],[26.130,-97.258],[26.200,-97.292],[26.300,-97.340],[26.400,-97.380],[26.500,-97.415],[26.600,-97.430],[26.800,-97.465],[27.200,-97.450]];
+// Approximate route (far west -> tower), lat/lon. Shape follows SpaceX's description.
+const ROUTE = [[25.38,-104.95],[25.50,-104.20],[25.95,-101.50],[26.35,-100.20],[26.55,-99.30],[26.48,-98.50],[26.42,-97.95],[26.33,-97.45],[26.30,-97.18],[26.27,-97.08],[26.19,-97.04],[26.10,-97.05],[26.03,-97.10],[26.0045,-97.142],[25.9972,-97.1566]];
+// Profile keyframes: t (s relative to catch), altitude km, horizontal speed m/s
+const PROFILE = [[-720,72,2900],[-600,60,2250],[-480,49,1600],[-390,41,1150],[-300,33,780],[-240,27.5,520],
+ [-180,20.0,270],[-141,16.0,230],[-100,11.0,150],[-60,5.8,95],[-30,2.3,70],[-18,1.0,55],[-16,0.85,40],
+ [-8,0.32,12],[-1,0.13,2],[0,0.10,0]];
+const EVENTS = [
+  {t:-180, name:'Transonic (T+22:29:34) ~20 km'},
+  {t:-141, name:'Subsonic (T+22:30:13) ~16 km'},
+  {t:-18,  name:'Landing burn + flip (T+22:32:16)'},
+  {t:0,    name:'CATCH (T+22:32:34)'},
+];
+const T0=-720, T1=30;
+const LIFTOFF_T = 22*3600+32*60+34;
+
+// ---------------------------------------------------------------- math helpers
+function pchip(xs,ys){const n=xs.length,h=[],d=[],m=new Array(n);
+  for(let i=0;i<n-1;i++){h[i]=xs[i+1]-xs[i];d[i]=(ys[i+1]-ys[i])/h[i];}
+  m[0]=d[0];m[n-1]=d[n-2];
+  for(let i=1;i<n-1;i++){if(d[i-1]*d[i]<=0)m[i]=0;else{const w1=2*h[i]+h[i-1],w2=h[i]+2*h[i-1];m[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);}}
+  return x=>{if(x<=xs[0])return ys[0];if(x>=xs[n-1])return ys[n-1];let i=0;while(x>xs[i+1])i++;const t=(x-xs[i])/h[i],t2=t*t,t3=t2*t;
+    return (2*t3-3*t2+1)*ys[i]+(t3-2*t2+t)*h[i]*m[i]+(-2*t3+3*t2)*ys[i+1]+(t3-t2)*h[i]*m[i+1];};}
+const Hf=pchip(PROFILE.map(k=>k[0]),PROFILE.map(k=>k[1]));
+const Vf=pchip(PROFILE.map(k=>k[0]),PROFILE.map(k=>k[2]));
+const D2R=Math.PI/180, R2D=180/Math.PI;
+const A=6378.137, E2=6.69437999014e-3;
+function ecef(lat,lon,h){const p=lat*D2R,l=lon*D2R,s=Math.sin(p),N=A/Math.sqrt(1-E2*s*s);
+  return [(N+h)*Math.cos(p)*Math.cos(l),(N+h)*Math.cos(p)*Math.sin(l),(N*(1-E2)+h)*s];}
+let ORIGIN={...SITES.rro, h:0.002, label:'Rocket Ranch Outpost (approx.)'};
+let O_ECEF, sinP, cosP, sinL, cosL;
+function setOrigin(o){ORIGIN=o;O_ECEF=ecef(o.lat,o.lon,0);sinP=Math.sin(o.lat*D2R);cosP=Math.cos(o.lat*D2R);sinL=Math.sin(o.lon*D2R);cosL=Math.cos(o.lon*D2R);}
+setOrigin(ORIGIN);
+// ENU (km) -> three.js vector (x=E, y=U, z=-N); includes Earth curvature
+function enu(lat,lon,h=0,out=new THREE.Vector3()){const P=ecef(lat,lon,h);const dx=P[0]-O_ECEF[0],dy=P[1]-O_ECEF[1],dz=P[2]-O_ECEF[2];
+  const e=-sinL*dx+cosL*dy, n=-sinP*cosL*dx-sinP*sinL*dy+cosP*dz, u=cosP*cosL*dx+cosP*sinL*dy+sinP*dz;return out.set(e,u,-n);}
+// flat local map coords (for the ground near the viewer and route spline)
+const LAT0=25.9580, LON0=-97.1970, KX=111.320*Math.cos(LAT0*D2R), KY=110.574;
+const toXY=(lat,lon)=>new THREE.Vector3((lon-LON0)*KX,(lat-LAT0)*KY,0);
+const fromXY=v=>[v.y/KY+LAT0, v.x/KX+LON0];
+function soundSpeed(hk){let T;if(hk<11)T=288.15-6.5*hk;else if(hk<20)T=216.65;else if(hk<32)T=216.65+(hk-20);else if(hk<47)T=228.65+2.8*(hk-32);else if(hk<51)T=270.65;else if(hk<71)T=270.65-2.8*(hk-51);else T=Math.max(186.9,214.65-2*(hk-71));return 20.05*Math.sqrt(T);}
+
+// ---------------------------------------------------------------- trajectory samples (lat/lon/alt/speed vs t)
+const DT=0.5, SAMPLES=[];
+(function buildSamples(){
+  // remaining horizontal distance to tower (km) integrating horizontal speed backward from catch
+  const n=Math.round((0-T0)/DT); const rem=new Array(n+1); rem[n]=0;
+  for(let i=n-1;i>=0;i--){const t=T0+(i+0.5)*DT; rem[i]=rem[i+1]+Vf(t)*DT/1000;}
+  const curve=new THREE.CatmullRomCurve3(ROUTE.map(p=>toXY(p[0],p[1])),false,'centripetal');
+  const L=curve.getLength(), scale=L/rem[0];
+  for(let i=0;i<=n;i++){const t=T0+i*DT; const u=Math.min(1,Math.max(0,1-rem[i]*scale/L));
+    const [lat,lon]=fromXY(curve.getPointAt(u)); const h=Hf(t);
+    const vz=(Hf(t+0.25)-Hf(t-0.25))/0.5*1000; const v=Math.hypot(Vf(t),vz);
+    SAMPLES.push({t,lat,lon,h,v});}
+  // after catch: hold at tower
+  for(let t=DT;t<=T1;t+=DT){SAMPLES.push({...SAMPLES[n],t,v:0});}
+})();
+function sampleAt(t){const f=(Math.min(T1,Math.max(T0,t))-T0)/DT, i=Math.min(SAMPLES.length-2,Math.floor(f)), a=SAMPLES[i], b=SAMPLES[i+1], k=f-i;
+  return {t, lat:a.lat+(b.lat-a.lat)*k, lon:a.lon+(b.lon-a.lon)*k, h:a.h+(b.h-a.h)*k, v:a.v+(b.v-a.v)*k};}
+
+// colour by Mach
+const cTmp=new THREE.Color();
+const STOPS=[[0,'#29d3ff'],[0.8,'#4dff88'],[1.0,'#ffe14d'],[2.5,'#ff8c1a'],[5,'#ff2d55'],[10,'#d14dff']].map(s=>[s[0],new THREE.Color(s[1])]);
+function machColor(m,out=new THREE.Color()){if(m<=STOPS[0][0])return out.copy(STOPS[0][1]);
+  for(let i=1;i<STOPS.length;i++){if(m<=STOPS[i][0]){const k=(m-STOPS[i-1][0])/(STOPS[i][0]-STOPS[i-1][0]);return out.copy(STOPS[i-1][1]).lerp(STOPS[i][1],k);}}return out.copy(STOPS[STOPS.length-1][1]);}
+
+// ---------------------------------------------------------------- renderer / scene
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,logarithmicDepthBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight,false);
+const scene=new THREE.Scene();
+const SKY=new THREE.Color('#0b1424'); scene.background=SKY;
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.005,30000);
+scene.add(new THREE.HemisphereLight(0xbfd8ff,0x3a3020,1.6));
+const sun=new THREE.DirectionalLight(0xffffff,1.6); sun.position.set(-50,80,40); scene.add(sun);
+const world=new THREE.Group(); scene.add(world);          // everything geo-referenced
+let groundGroup, pathGroup, labelGroup, shipObj;
+const controls=new OrbitControls(camera,canvas); controls.enableDamping=true; controls.maxDistance=4000; controls.minDistance=0.05;
+
+function makeLabel(text,color='#fff',size=1){
+  const c=document.createElement('canvas'),g=c.getContext('2d'),fs=40;
+  g.font=`600 ${fs}px -apple-system,Segoe UI,Roboto,sans-serif`;const w=Math.ceil(g.measureText(text).width)+28,h=fs+20;
+  c.width=w;c.height=h+18;g.font=`600 ${fs}px -apple-system,Segoe UI,Roboto,sans-serif`;
+  g.fillStyle='rgba(8,12,22,.78)';g.beginPath();g.roundRect(0,0,w,h,12);g.fill();
+  g.strokeStyle=color;g.lineWidth=3;g.stroke();
+  g.fillStyle=color;g.beginPath();g.moveTo(w/2-9,h);g.lineTo(w/2+9,h);g.lineTo(w/2,h+16);g.fill();
+  g.fillStyle='#fff';g.textBaseline='middle';g.fillText(text,14,h/2+1);
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;
+  const m=new THREE.SpriteMaterial({map:tex,depthTest:false,depthWrite:false,sizeAttenuation:false,transparent:true});
+  const s=new THREE.Sprite(m);const k=0.042*size;s.scale.set(k*c.width/c.height,k,1);s.center.set(0.5,0);s.renderOrder=10;return s;}
+function dotSprite(color,size=0.018){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+  const gr=g.createRadialGradient(32,32,2,32,32,30);gr.addColorStop(0,'#fff');gr.addColorStop(0.35,color);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);
+  const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false,sizeAttenuation:false,transparent:true}));s.scale.set(size,size,1);s.renderOrder=11;return s;}
+
+function polyToShapeXY(pts){return pts.map(p=>{const v=enu(p[0],p[1],0);return new THREE.Vector2(v.x,-v.z);});}
+function lineFromLatLon(pts,color,h=0.01,opacity=1){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>enu(p[0],p[1],h)));
+  return new THREE.Line(g,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity}));}
+
+function buildWorld(){
+  world.clear();
+  groundGroup=new THREE.Group(); pathGroup=new THREE.Group(); labelGroup=new THREE.Group(); world.add(groundGroup,pathGroup,labelGroup);
+  // Earth cap (curved) far backdrop
+  const R=6371;const cap=new THREE.Mesh(new THREE.SphereGeometry(R,192,64,0,Math.PI*2,0,0.2),new THREE.MeshLambertMaterial({color:'#4f5a37'}));
+  cap.position.set(0,-R-0.4,0);groundGroup.add(cap);
+  // Ocean disk
+  const ocean=new THREE.Mesh(new THREE.CircleGeometry(300,96),new THREE.MeshLambertMaterial({color:'#0f4c75'}));ocean.rotation.x=-Math.PI/2;ocean.position.set(240,-0.02,0);groundGroup.add(ocean);
+  // Mainland polygon: Gulf coast (south->north to the pass), Laguna Madre shore north, then far west box
+  const gulf=GEO.gulf; const main=[[25.30,-97.40],[25.60,-97.22],...gulf,...LAGUNA_SHORE.slice(1),[27.2,-98.9],[25.3,-98.9]];
+  const mshape=new THREE.Shape(polyToShapeXY(main));
+  const landMat=new THREE.MeshLambertMaterial({color:'#4f5a37'});
+  const land=new THREE.Mesh(new THREE.ShapeGeometry(mshape),landMat);land.rotation.x=-Math.PI/2;groundGroup.add(land);
+  // Barrier island (South Padre / Padre Island): Gulf side from OSM, lagoon side offset
+  const spi=GEO.spi.concat([[26.80,-97.33],[27.2,-97.37]]); const inner=spi.map((p,i)=>[p[0],p[1]-(0.008+0.018*Math.min(1,(p[0]-26.06)/0.4))]).reverse();
+  const ishape=new THREE.Shape(polyToShapeXY(spi.concat(inner)));
+  const isl=new THREE.Mesh(new THREE.ShapeGeometry(ishape),new THREE.MeshLambertMaterial({color:'#d9c98f'}));isl.rotation.x=-Math.PI/2;isl.position.y=0.002;groundGroup.add(isl);
+  // coast + river lines
+  groundGroup.add(lineFromLatLon(GEO.gulf,'#f3e2a9',0.01));
+  groundGroup.add(lineFromLatLon(GEO.spi,'#f3e2a9',0.01));
+  groundGroup.add(lineFromLatLon(GEO.river,'#6ec6ff',0.012));
+  // tower
+  const tw=enu(SITES.tower.lat,SITES.tower.lon,0);
+  const tower=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.15,0.03),new THREE.MeshLambertMaterial({color:'#cfd6e6'}));tower.position.copy(tw).add(new THREE.Vector3(0,0.075,0));world.add(tower);
+  // site markers + labels
+  for(const [k,s] of Object.entries(SITES)){
+    if(k==='rro'&&ORIGIN.lat!==SITES.rro.lat){} 
+    const p=enu(s.lat,s.lon,0);
+    const big=['rro','tower'].includes(k);
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(big?0.02:0.04,big?0.02:0.04,big?0.6:1.2,8),new THREE.MeshBasicMaterial({color:s.color}));
+    pole.position.copy(p).add(new THREE.Vector3(0,big?0.3:0.6,0));labelGroup.add(pole);
+    const lab=makeLabel(s.name,s.color,big?1:0.85);lab.position.copy(p).add(new THREE.Vector3(0,big?0.6:1.2,0));lab.userData.site=k;labelGroup.add(lab);
+  }
+  if(ORIGIN.lat!==SITES.rro.lat){const p=new THREE.Vector3(0,0.3,0);const lab=makeLabel('YOU (GPS)','#7dff9a');lab.position.copy(p);labelGroup.add(lab);}
+  // trajectory points
+  const pts=[],cols=[],step=4; // every 2 s
+  for(let i=0;i<SAMPLES.length;i+=step){const s=SAMPLES[i];if(s.t>0)break;pts.push(enu(s.lat,s.lon,s.h));cols.push(machColor(s.v/soundSpeed(s.h)));}
+  pts.push(enu(SITES.tower.lat,SITES.tower.lon,0.1)); cols.push(machColor(0));
+  // tube
+  const curve=new THREE.CatmullRomCurve3(pts,false,'centripetal');
+  const segs=1400, tube=new THREE.TubeGeometry(curve,segs,0.09,8,false);
+  // colour rings by nearest sample (arc-length param)
+  const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+pts[i].distanceTo(pts[i-1]));const Ltot=cum[cum.length-1];
+  const colorArr=new Float32Array(tube.attributes.position.count*3);
+  for(let i=0;i<=segs;i++){const target=i/segs*Ltot;let lo=0,hi=cum.length-1;while(hi-lo>1){const mid=(lo+hi)>>1;if(cum[mid]<target)lo=mid;else hi=mid;}
+    const c=cols[lo];for(let j=0;j<=8;j++){const idx=(i*9+j)*3;colorArr[idx]=c.r;colorArr[idx+1]=c.g;colorArr[idx+2]=c.b;}}
+  tube.setAttribute('color',new THREE.BufferAttribute(colorArr,3));
+  const tubeMesh=new THREE.Mesh(tube,new THREE.MeshBasicMaterial({vertexColors:true}));tubeMesh.name='tube';pathGroup.add(tubeMesh);
+  // screen-space line (always visible, thicker in AR)
+  const lg=new LineGeometry();lg.setPositions(pts.flatMap(p=>[p.x,p.y,p.z]));lg.setColors(cols.flatMap(c=>[c.r,c.g,c.b]));
+  const lm=new LineMaterial({vertexColors:true,linewidth:2.5,worldUnits:false,transparent:true,opacity:0.95});lm.resolution.set(innerWidth,innerHeight);
+  const line=new Line2(lg,lm);line.computeLineDistances();line.name='line';line.renderOrder=5;pathGroup.add(line);
+  // ground track shadow + drop lines near the end
+  const gt=[];for(let i=0;i<SAMPLES.length;i+=8){const s=SAMPLES[i];if(s.t>0)break;gt.push([s.lat,s.lon]);}
+  const shadow=lineFromLatLon(gt,'#ffffff',0.015,0.35);shadow.name='groundtrack';groundGroup.add(shadow);
+  // event markers
+  for(const ev of EVENTS){const s=sampleAt(ev.t);const p=enu(s.lat,s.lon,s.h);const d=dotSprite('#ffffff',0.016);d.position.copy(p);pathGroup.add(d);
+    if(ev.t<0){const lab=makeLabel(ev.name,'#ffe14d',0.8);lab.position.copy(p);if(ev.t>-30){lab.center.set(0,0);lab.position.y+=1.0;}pathGroup.add(lab);}
+    if(ev.t<0){const g=new THREE.BufferGeometry().setFromPoints([p,enu(s.lat,s.lon,0)]);pathGroup.add(new THREE.Line(g,new THREE.LineDashedMaterial({color:'#ffe14d',dashSize:0.3,gapSize:0.3,transparent:true,opacity:.5})).computeLineDistances());}}
+  // corridor note label
+  {const s=sampleAt(-235);const lab=makeLabel('Passes N of South Padre Island → Gulf → final turn south','#9fe3ff',0.75);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
+  {const s=sampleAt(-480);const lab=makeLabel('Hypersonic glide over N. Mexico (approx.)','#ff8c9a',0.8);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
+  // ship
+  shipObj=new THREE.Group();const sd=dotSprite('#ffb347',0.05);shipObj.add(sd);const sl=makeLabel('SHIP','#ffb347',0.9);sl.position.y=0;shipObj.add(sl);shipObj.userData.label=sl;
+  const sphere=new THREE.Mesh(new THREE.SphereGeometry(0.12,16,12),new THREE.MeshBasicMaterial({color:'#ffb347'}));shipObj.add(sphere);world.add(shipObj);
+}
+buildWorld();
+
+// ---------------------------------------------------------------- views
+function resetView(){camera.position.set(-16,13,16);controls.target.set(6,4,-13);camera.fov=50;camera.updateProjectionMatrix();controls.update();}
+function fullView(){camera.position.set(-380,520,640);controls.target.set(-380,0,-50);controls.update();}
+resetView();
+
+// ---------------------------------------------------------------- UI state
+const $=id=>document.getElementById(id);
+let t=-200, playing=false, rate=1, live=false;
+let catchEpoch=Date.UTC(2026,10,14,21,20,10);
+function parseCatch(){const m=$('catchInput').value.trim().match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?$/);if(!m)return;
+  catchEpoch=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]+6,+m[5],+(m[6]||0));} // CT = UTC-6 (CST)
+$('catchInput').addEventListener('change',parseCatch);
+{const hp=new URLSearchParams(location.hash.slice(1));if(hp.has('t'))t=+hp.get('t');if(hp.get('view')==='full')fullView();}
+const fmtCT=ms=>new Date(ms).toLocaleTimeString('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit',second:'2-digit'});
+function fmtT(s){const a=Math.abs(s),m=Math.floor(a/60),ss=Math.floor(a%60);return (s<0?'−':'+')+m+':'+String(ss).padStart(2,'0');}
+function compass(az){return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(az/22.5)%16];}
+function phase(t,s){if(t>=0)return 'Caught (if all went well)';if(t>=-18)return 'Landing burn · flip · catch';if(t>=-141)return 'Subsonic bellyflop';if(t>=-180)return 'Transonic';if(s.h>45)return 'Hypersonic entry glide';return 'Supersonic';}
+$('btnPlay').onclick=()=>{playing=!playing;live=false;$('btnLive').classList.remove('on');$('btnPlay').textContent=playing?'❚❚ Pause':'▶︎ Play';};
+const RATES=[1,5,20,60];$('btnRate').onclick=()=>{rate=RATES[(RATES.indexOf(rate)+1)%RATES.length];$('btnRate').textContent=rate+'×';};
+$('scrub').oninput=e=>{t=+e.target.value;live=false;$('btnLive').classList.remove('on');};
+$('btnLive').onclick=()=>{live=!live;$('btnLive').classList.toggle('on',live);if(live){playing=false;$('btnPlay').textContent='▶︎ Play';}};
+$('btnReset').onclick=resetView;$('btnFull').onclick=fullView;
+$('btnInfo').onclick=$('approxBadge').onclick=()=>{$('info').style.display='block';};
+$('btnCloseInfo').onclick=()=>{$('info').style.display='none';};
+function toast(s,ms=3500){const m=$('msg');m.textContent=s;m.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>m.style.display='none',ms);}
+$('btnGPS').onclick=()=>{if(!navigator.geolocation)return toast('No geolocation available');
+  navigator.geolocation.getCurrentPosition(p=>{setOrigin({lat:p.coords.latitude,lon:p.coords.longitude,h:0.002,label:'GPS'});buildWorld();resetView();
+    const d=enuDist(SITES.rro);$('viewerTxt').textContent=`GPS ±${Math.round(p.coords.accuracy)} m (${d.toFixed(1)} km from RRO)`;toast('Viewer moved to your GPS position');},
+    e=>toast('GPS failed: '+e.message),{enableHighAccuracy:true,timeout:15000});};
+$('btnRRO').onclick=()=>{setOrigin({...SITES.rro,h:0.002});buildWorld();resetView();$('viewerTxt').textContent='';};
+function enuDist(s){const v=enu(s.lat,s.lon,0);return Math.hypot(v.x,v.z);}
+
+// ---------------------------------------------------------------- AR (camera passthrough + compass) & WebXR
+let arMode=null; // null | 'pass' | 'xr'
+const video=$('video');
+let ori=null, absOri=false, compassOffset=null, manualOffset=0, lastCompass=null, compassAcc=null;
+const zee=new THREE.Vector3(0,0,1), q1=new THREE.Quaternion(-Math.sqrt(0.5),0,0,Math.sqrt(0.5)), eul=new THREE.Euler(), q0=new THREE.Quaternion();
+function onOri(e){ if(e.alpha==null)return; ori={a:e.alpha,b:e.beta,g:e.gamma};
+  if(typeof e.webkitCompassHeading==='number'&&e.webkitCompassHeading>=0&&!absOri){
+    const decl=+$('declInput').value||0; const hdg=(e.webkitCompassHeading+decl+360)%360; lastCompass=hdg; compassAcc=e.webkitCompassAccuracy;
+    let off=((360-hdg)-e.alpha+720)%360; // alpha_world = alpha + off
+    if(compassOffset==null)compassOffset=off; else {let d=((off-compassOffset+540)%360)-180; compassOffset=(compassOffset+d*0.05+360)%360;}
+  }}
+function onAbs(e){ if(e.alpha==null)return; absOri=true; ori={a:e.alpha,b:e.beta,g:e.gamma}; compassOffset=0; lastCompass=(360-e.alpha)%360; }
+function screenAngle(){return (screen.orientation&&screen.orientation.angle)||window.orientation||0;}
+function applyOrientation(cam){ if(!ori)return;
+  const a=(ori.a+(compassOffset||0)+manualOffset)*D2R, b=ori.b*D2R, g=ori.g*D2R, o=screenAngle()*D2R;
+  eul.set(b,a,-g,'YXZ'); cam.quaternion.setFromEuler(eul); cam.quaternion.multiply(q1); cam.quaternion.multiply(q0.setFromAxisAngle(zee,-o)); }
+function updateArFov(){ if(arMode!=='pass')return; const F=(+$('fovInput').value||67)*D2R; const vw=video.videoWidth||3, vh=video.videoHeight||4, W=innerWidth, H=innerHeight;
+  const s=Math.max(W/vw,H/vh); const longPx=Math.max(vw,vh)*s; const vfov=2*Math.atan(Math.tan(F/2)*H/longPx);
+  camera.fov=vfov*R2D; camera.updateProjectionMatrix(); }
+$('fovInput').addEventListener('change',updateArFov);
+function camAz(cam){const d=new THREE.Vector3(0,0,-1).applyQuaternion(cam.quaternion);return (Math.atan2(d.x,-d.z)*R2D+360)%360;}
+function towerAz(){const v=enu(SITES.tower.lat,SITES.tower.lon,0);return (Math.atan2(v.x,-v.z)*R2D+360)%360;}
+$('btnAlign').onclick=()=>{ if(arMode==='pass'){manualOffset+=camAz(camera)-towerAz(); toast('Heading aligned: tower is straight ahead');}
+  else if(arMode==='xr'){alignXR(towerAz());}};
+$('btnL').onclick=()=>{ if(arMode==='xr')world.rotation.y+=2*D2R; else manualOffset+=2; };
+$('btnR').onclick=()=>{ if(arMode==='xr')world.rotation.y-=2*D2R; else manualOffset-=2; };
+
+function setArVisuals(on){ groundGroup.visible=!on; scene.background=on?null:SKY;
+  const line=pathGroup.getObjectByName('line'); if(line)line.material.linewidth=on?6:2.5;
+  const tube=pathGroup.getObjectByName('tube'); if(tube)tube.visible=!on;
+  document.body.classList.toggle('ar',on); $('btnAR').classList.toggle('on',on); $('btnAR').textContent=on?'Exit AR':'AR'; }
+
+async function startAR(){
+  // iOS motion permission must be requested synchronously inside the tap
+  let permP=null;
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){permP=DeviceOrientationEvent.requestPermission().catch(e=>'denied');}
+  if(!window.isSecureContext){toast('AR needs HTTPS (or localhost): camera and motion sensors are blocked on this page.',6000);return;}
+  // Prefer WebXR immersive-ar where it exists (Android Chrome)
+  try{ if(!permP&&navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar')){ return startXR(); } }catch(e){}
+  if(permP){const r=await permP;if(r!=='granted'){toast('Motion permission denied – enable it in Safari settings and reload.',6000);return;}}
+  try{ const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    video.srcObject=stream; video.style.display='block'; await video.play().catch(()=>{}); }
+  catch(e){toast('Camera unavailable ('+e.name+') – showing sensor-only AR over black.',5000);}
+  window.addEventListener('deviceorientation',onOri,true);
+  if('ondeviceorientationabsolute' in window)window.addEventListener('deviceorientationabsolute',onAbs,true);
+  arMode='pass'; controls.enabled=false; camera.position.set(0,ORIGIN.h||0.002,0); setArVisuals(true);
+  video.onloadedmetadata=updateArFov; updateArFov();
+  toast('Hold the phone up. If the tower label is off, point at the real tower and tap "Align to tower".',6000);
+}
+function stopAR(){
+  if(arMode==='xr'){const s=renderer.xr.getSession();if(s)s.end();return;}
+  window.removeEventListener('deviceorientation',onOri,true);window.removeEventListener('deviceorientationabsolute',onAbs,true);
+  const st=video.srcObject;if(st)st.getTracks().forEach(tr=>tr.stop());video.srcObject=null;video.style.display='none';
+  arMode=null;controls.enabled=true;setArVisuals(false);resetView(); }
+$('btnAR').onclick=()=>{arMode?stopAR():startAR();};
+
+// WebXR (Android): world in metres, yaw aligned from absolute compass if available, else "Align to tower"
+let xrNeedsYaw=false;
+async function startXR(){
+  if('ondeviceorientationabsolute' in window)window.addEventListener('deviceorientationabsolute',onAbs,true);
+  const session=await navigator.xr.requestSession('immersive-ar',{optionalFeatures:['dom-overlay','local'],domOverlay:{root:$('ui')}});
+  renderer.xr.enabled=true; renderer.xr.setReferenceSpaceType('local'); camera.near=0.5; camera.far=2e6; camera.updateProjectionMatrix();
+  world.scale.setScalar(1000); world.position.set(0,-1.5,0); world.rotation.set(0,0,0);
+  await renderer.xr.setSession(session); arMode='xr'; xrNeedsYaw=true; setArVisuals(true);
+  session.addEventListener('end',()=>{renderer.xr.enabled=false;world.scale.setScalar(1);world.position.set(0,0,0);world.rotation.set(0,0,0);camera.near=0.005;camera.far=30000;camera.updateProjectionMatrix();arMode=null;setArVisuals(false);resetView();window.removeEventListener('deviceorientationabsolute',onAbs,true);});
+  toast('If the path looks rotated, point at the Starbase tower and tap "Align to tower".',6000);
+}
+function alignXR(targetAz){const xc=renderer.xr.getCamera();const d=new THREE.Vector3(0,0,-1).applyQuaternion(xc.getWorldQuaternion(new THREE.Quaternion()));
+  d.applyQuaternion(world.quaternion.clone().invert());const az=(Math.atan2(d.x,-d.z)*R2D+360)%360;world.rotation.y+=(targetAz-az)*D2R;}
+
+// ---------------------------------------------------------------- off-screen arrow
+const arrow=$('arrow'), vtmp=new THREE.Vector3();
+function updateArrow(wpos,cam){ if(!arMode){arrow.style.display='none';return;}
+  vtmp.copy(wpos).project(cam); const behind=vtmp.z>1; let x=vtmp.x,y=vtmp.y; if(behind){x=-x;y=-y;}
+  if(!behind&&Math.abs(x)<0.92&&Math.abs(y)<0.85){arrow.style.display='none';return;}
+  const ang=Math.atan2(x,y); const k=0.85/Math.max(Math.abs(x),Math.abs(y),1e-6); const px=(x*k*0.5+0.5)*innerWidth, py=(-y*k*0.5+0.5)*innerHeight;
+  arrow.style.display='block'; arrow.style.left=(px-14)+'px'; arrow.style.top=(py-13)+'px'; arrow.style.transform=`rotate(${ang}rad)`; }
+
+// ---------------------------------------------------------------- loop
+let last=performance.now();
+const shipPos=new THREE.Vector3();
+function frame(now){
+  const dt=Math.min(0.1,(now-last)/1000); last=now;
+  if(live){t=(Date.now()-catchEpoch)/1000;}
+  else if(playing){t+=dt*rate; if(t>T1){t=T1;playing=false;$('btnPlay').textContent='▶︎ Play';}}
+  const tc=Math.min(T1,Math.max(T0,t)); $('scrub').value=tc;
+  const s=sampleAt(tc); enu(s.lat,s.lon,s.h,shipPos); shipObj.position.copy(shipPos);
+  // desktop: keep ship sphere visible at any zoom
+  const cd=camera.position.distanceTo(shipPos)/(world.scale.x||1); shipObj.children[2].scale.setScalar(Math.max(0.3,cd*0.004)); shipObj.children[2].visible=!arMode;
+  // readouts (from viewer at origin)
+  const hz=Math.hypot(shipPos.x,shipPos.z), el=Math.atan2(shipPos.y-(ORIGIN.h||0.002),hz)*R2D, az=(Math.atan2(shipPos.x,-shipPos.z)*R2D+360)%360, rng=shipPos.length();
+  const mach=s.v/soundSpeed(s.h);
+  $('phase').textContent=(live&&(t<T0)?'Waiting for entry · ':'')+phase(tc,s);
+  $('rT').textContent=t<0?fmtT(t):'caught '+fmtT(t);
+  $('rClock').textContent=fmtCT(catchEpoch+tc*1000);
+  $('rAlt').textContent=`${s.h.toFixed(s.h<2?2:1)} km · ${Math.round(s.h*3280.84).toLocaleString()} ft`;
+  $('rSpd').textContent=`${Math.round(s.v*3.6).toLocaleString()} km/h · M${mach.toFixed(mach<2?2:1)}`;
+  $('rAzEl').textContent=`${Math.round(az)}° ${compass(az)} / ${el.toFixed(1)}°${el<0?' (below horizon)':''}`;
+  $('rRng').textContent=`${rng<10?rng.toFixed(2):Math.round(rng).toLocaleString()} km`;
+  $('tlabel').textContent=`T+${fmtHMS(LIFTOFF_T+tc)} · ${fmtT(tc)}`;
+  if(arMode==='pass'){applyOrientation(camera);$('hdgTxt').textContent=`view ${Math.round(camAz(camera))}° ${compass(camAz(camera))}`+(lastCompass!=null?` · compass ${absOri?'abs':'±'+(compassAcc??'?')+'°'}`:' · no compass yet');}
+  if(arMode==='xr'&&xrNeedsYaw&&absOri&&lastCompass!=null){const xc=renderer.xr.getCamera();if(xc){xrNeedsYaw=false;alignXR(lastCompass);}}
+  if(!arMode)controls.update();
+  const cam=arMode==='xr'?renderer.xr.getCamera():camera;
+  updateArrow(shipObj.getWorldPosition(vtmp.clone()),cam);
+  renderer.render(scene,camera);
+}
+function fmtHMS(x){x=Math.max(0,x);const h=Math.floor(x/3600),m=Math.floor(x%3600/60),s=Math.floor(x%60);return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+renderer.setAnimationLoop(frame);
+addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  const line=pathGroup.getObjectByName('line');if(line)line.material.resolution.set(innerWidth,innerHeight);updateArFov();});
+window.__f15={SAMPLES,sampleAt,EVENTS};
+if(!window.isSecureContext)setTimeout(()=>toast('Opened without HTTPS: 3D view works; AR (camera/compass) needs HTTPS.',5000),800);
+</script>
+</body>
+</html>

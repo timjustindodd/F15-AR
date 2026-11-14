@@ -1,1 +1,1 @@
-# f15-ar
+Starship Flight 15 ship-return viewer: one static page for the approximate catch trajectory, with the 3D view, AR camera modes, time scrubber, readouts, and GPS. The chrome follows the Propulsive game’s Everyday Astronaut look (flat charcoal, brand orange, and the top-left logo watermark), and GitHub Pages serves it from the repository root.
