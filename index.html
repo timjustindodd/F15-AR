@@ -407,7 +407,7 @@ function buildWorld(){
   {const s=sampleAt(-235);const lab=makeLabel('Passes N of South Padre Island → Gulf → final turn south','#9fe3ff',0.75);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   {const s=sampleAt(-480);const lab=makeLabel('Hypersonic glide over N. Mexico (approx.)','#ff8c9a',0.8);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   // ship
-  shipObj=new THREE.Group();const sd=dotSprite('#ffe7b0',0.09);shipObj.add(sd);
+  shipObj=new THREE.Group();const sd=dotSprite('#ffe7b0',0.09);sd.visible=false;shipObj.add(sd);
   const sphere=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,12),new THREE.MeshBasicMaterial({color:'#F84D1E'}));sphere.visible=false;shipObj.add(sphere);world.add(shipObj);
   refreshHorizon();
 }
