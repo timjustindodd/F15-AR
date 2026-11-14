@@ -27,7 +27,7 @@
     --f-num:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace;
   }
   html,body{margin:0;height:100%;overflow:hidden;background:#16181c;color:var(--fg);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
-  #video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:0}
+  #video{position:fixed;left:0;top:0;right:0;bottom:0;width:100vw;height:100vh;height:100dvh;min-width:100%;min-height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center;display:none;z-index:0;transform:translateZ(0)}
   #c{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
   #ui{position:fixed;inset:0;z-index:2;pointer-events:none}
   #ui .p{pointer-events:auto}
@@ -141,7 +141,7 @@
     <div class="hudline"><span id="rAlt">—</span> · <span id="rAzEl">—</span></div>
   </div>
   <div id="msg" class="panel"></div>
-  <div id="arrow"><span>SHIP</span></div>
+  <div id="arrow"></div>
   <div id="arrowTower"><span>PAD</span></div>
   <div id="infoScrim" hidden>
   <div id="info" class="panel p">
@@ -407,7 +407,7 @@ function buildWorld(){
   {const s=sampleAt(-235);const lab=makeLabel('Passes N of South Padre Island → Gulf → final turn south','#9fe3ff',0.75);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   {const s=sampleAt(-480);const lab=makeLabel('Hypersonic glide over N. Mexico (approx.)','#ff8c9a',0.8);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   // ship
-  shipObj=new THREE.Group();const sd=dotSprite('#ffe7b0',0.09);shipObj.add(sd);const sl=makeLabel('SHIP','#F84D1E',1.15);sl.position.y=0;shipObj.add(sl);shipObj.userData.label=sl;
+  shipObj=new THREE.Group();const sd=dotSprite('#ffe7b0',0.09);shipObj.add(sd);
   const sphere=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,12),new THREE.MeshBasicMaterial({color:'#F84D1E'}));sphere.visible=false;shipObj.add(sphere);world.add(shipObj);
   refreshHorizon();
 }
@@ -542,7 +542,7 @@ async function startAR(pre){
   try{ if(!permP&&!camP&&navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar')){ return startXR(); } }catch(e){}
   if(permP){const r=await permP;if(r!=='granted')toast('Motion permission denied – enable it in Safari settings and reload.',6000);}
   let stream=null;
-  try{ stream=await (camP||cameraPromise()); video.srcObject=stream; video.style.display='block'; const play=video.play(); if(play)await play.catch(()=>{}); }
+  try{ stream=await (camP||cameraPromise()); if(video.srcObject!==stream)video.srcObject=stream; video.style.display='block'; const play=video.play(); if(play)await play.catch(()=>{}); }
   catch(e){toast('Camera unavailable ('+(e&&e.name||'error')+') – showing sensor-only AR over black.',5000);}
   window.addEventListener('deviceorientation',onOri,true);
   if('ondeviceorientationabsolute' in window)window.addEventListener('deviceorientationabsolute',onAbs,true);
@@ -551,18 +551,18 @@ async function startAR(pre){
   qReady=false;
 }
 function grantFromFirstTap(){
-  document.removeEventListener('pointerdown',grantFromFirstTap,true);
+  if(grantFromFirstTap.done)return; grantFromFirstTap.done=true; document.removeEventListener('click',grantFromFirstTap,true); document.removeEventListener('touchend',grantFromFirstTap,true);
   $('start').hidden=true;
   // Motion permission, the camera, and play are started in this same tap.
   const permP=iosNeedsGesture()?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):null;
   let camP; try{camP=cameraPromise();}catch(e){camP=Promise.reject(e);}
-  camP.then(stream=>{video.srcObject=stream;video.style.display='block';const p=video.play();if(p)p.catch(()=>{});}).catch(()=>{});
-  startGps();
+    startGps();
   startAR({permP,camP});
 }
 function beginPhone(){
   $('start').hidden=false;
-  document.addEventListener('pointerdown',grantFromFirstTap,true);
+  // iOS only grants motion permission from a click/touchend (not pointerdown/touchstart).
+  document.addEventListener('click',grantFromFirstTap,true); document.addEventListener('touchend',grantFromFirstTap,true);
 }
 if(PHONE)beginPhone();
 
