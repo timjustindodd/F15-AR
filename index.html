@@ -617,7 +617,7 @@ function frame(now){
   const tc=Math.min(T1,Math.max(T0,t)); $('scrub').value=tc;
   const s=sampleAt(tc); enu(s.lat,s.lon,s.h,shipPos); shipObj.position.copy(shipPos);
   // desktop: keep ship sphere visible at any zoom
-  shipObj.children[2].visible=false;
+  shipObj.children[1].visible=false;
   // readouts (from viewer at origin)
   const hz=Math.hypot(shipPos.x,shipPos.z), el=Math.atan2(shipPos.y-(ORIGIN.h||0.002),hz)*R2D, az=(Math.atan2(shipPos.x,-shipPos.z)*R2D+360)%360, rng=shipPos.length();
   const mach=s.v/soundSpeed(s.h);
