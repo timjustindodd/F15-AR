@@ -91,14 +91,11 @@
   .livebits{font-family:var(--f-num);font-size:12px;color:var(--fg);line-height:1.45}
   .livebits div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(51,56,63,.6);padding:2px 0}
   .livebits span:first-child{color:var(--dim);font-family:var(--f-label);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
-  #desk,#start{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto}
-  #desk{background:#16181c;font:800 clamp(28px,8vw,44px)/1.1 var(--f-label);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
-  #start{background:rgba(8,10,14,.82)}
-  #start p{margin:0 0 14px;font:700 13px/1.3 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-  #start button{min-height:52px;padding:14px 28px;font-size:22px;background:var(--acc);color:var(--ink);border:0}
+  #desk{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto;background:#16181c;font:800 clamp(28px,8vw,44px)/1.1 var(--f-label);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
+  #start{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:none;pointer-events:none;padding:6px 10px;border-radius:6px;background:rgba(22,24,28,.55);font:700 13px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--fg);white-space:nowrap}
   body.desk #desk{display:flex}
   body.desk #c,body.desk #ui,body.desk #video{display:none!important}
-  body.phone #start:not([hidden]){display:flex}
+  body.phone #start:not([hidden]){display:block}
   @media (max-width:560px){
     #tlabel{display:none}
     #wm{width:84px}
@@ -118,12 +115,7 @@
 <video id="video" playsinline muted autoplay></video>
 <canvas id="c"></canvas>
 <div id="desk">Open on your phone</div>
-<div id="start" hidden>
-  <div>
-    <p>Flight 15 · camera</p>
-    <button id="btnStart" type="button">Tap to start</button>
-  </div>
-</div>
+<div id="start" hidden>Tap to start</div>
 <div id="ui">
   <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
   <div id="tape" aria-hidden="true">
@@ -158,7 +150,7 @@
     </ul>
     <h4>Limits</h4>
     <ul>
-      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. Camera and motion need <b>HTTPS</b>. iPhone asks once, on the tap-to-start button.</li>
+      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. Camera, motion, and location are requested as soon as the page loads. On iPhone, the first tap anywhere allows motion and the camera. There is no AR button.</li>
       <li>iPhone Safari has no WebXR AR, so on iOS this uses camera passthrough + compass (iOS 13+ asks for Motion permission). Android Chrome uses WebXR <code>immersive-ar</code> when supported.</li>
       <li>Compass accuracy varies. On iPhone, heading is <code>webkitCompassHeading</code> (magnetic) plus declination. If accuracy is below 0 or worse than 20°, calibrate with a figure-8. Point the reticle at the real Pad 1 tower and tap <b>Align to tower</b>. The offset is saved on this phone.</li>
       <li>Declination is a south-Texas constant of <b>+2.5° E</b> (true = magnetic + east declination), not a full World Magnetic Model run. Edit it if you are somewhere else. It is applied only to the magnetic compass, not to <code>deviceorientationabsolute</code>.</li>
@@ -461,13 +453,13 @@ function onGps(pos){
   if(gpsBuilt){const dy=(gpsEst.lat-gpsBuilt.lat)*110574, dx=(gpsEst.lon-gpsBuilt.lon)*111320*Math.cos(gpsEst.lat*D2R);rebuild=Math.hypot(dx,dy)>8;}
   applyGps(gpsEst.lat,gpsEst.lon,gpsEst.acc,rebuild);
 }
-$('btnGPS').onclick=()=>{if(!navigator.geolocation)return toast('No geolocation available');
-  stopGps();gpsEst=null;gpsBuilt=null;
+function startGps(){if(!navigator.geolocation||gpsWatchId!=null)return;
   gpsWatchId=navigator.geolocation.watchPosition(onGps,e=>{
     toast(e.code===1?'Location denied – staying at Rocket Ranch Outpost':'GPS: '+e.message);
     if(!gpsEst){$('rGps').textContent='Outpost';}
-  },{enableHighAccuracy:true,maximumAge:0,timeout:60000});
-  toast('Watching GPS (high accuracy)…');};
+  },{enableHighAccuracy:true,maximumAge:0,timeout:60000});}
+$('btnGPS').onclick=()=>{if(!navigator.geolocation)return toast('No geolocation available');
+  stopGps();gpsEst=null;gpsBuilt=null;startGps();};
 $('btnRRO').onclick=()=>{stopGps();gpsEst=null;gpsBuilt=null;setOrigin({...SITES.rro,h:0.002,label:'Rocket Ranch Outpost (approx.)'});buildWorld();camera.position.set(0,0.002,0);$('viewerTxt').textContent='';$('rGps').textContent='Outpost';};
 function enuDist(s){const v=enu(s.lat,s.lon,0);return Math.hypot(v.x,v.z);}
 
@@ -531,29 +523,38 @@ function setArVisuals(videoOn){ groundGroup.visible=false; scene.background=vide
   const tube=pathGroup.getObjectByName('tube'); if(tube)tube.visible=false;
   document.body.classList.add('ar'); }
 
-async function startAR(){
-  // iOS motion permission must be requested synchronously inside the tap
-  let permP=null;
-  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){permP=DeviceOrientationEvent.requestPermission().catch(e=>'denied');}
+function iosNeedsGesture(){return typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';}
+function cameraPromise(){return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});}
+async function startAR(pre){
+  const permP=pre&&pre.permP, camP=pre&&pre.camP;
   if(!window.isSecureContext){toast('AR needs HTTPS (or localhost): camera and motion sensors are blocked on this page.',6000);return;}
-  // Prefer WebXR immersive-ar where it exists (Android Chrome)
-  try{ if(!permP&&navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar')){ return startXR(); } }catch(e){}
-  if(permP){const r=await permP;if(r!=='granted'){toast('Motion permission denied – enable it in Safari settings and reload.',6000);return;}}
-  try{ const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
-    video.srcObject=stream; video.style.display='block'; await video.play().catch(()=>{}); }
-  catch(e){toast('Camera unavailable ('+e.name+') – showing sensor-only AR over black.',5000);}
+  try{ if(!permP&&!camP&&navigator.xr&&await navigator.xr.isSessionSupported('immersive-ar')){ return startXR(); } }catch(e){}
+  if(permP){const r=await permP;if(r!=='granted')toast('Motion permission denied – enable it in Safari settings and reload.',6000);}
+  let stream=null;
+  try{ stream=await (camP||cameraPromise()); video.srcObject=stream; video.style.display='block'; const play=video.play(); if(play)await play.catch(()=>{}); }
+  catch(e){toast('Camera unavailable ('+(e&&e.name||'error')+') – showing sensor-only AR over black.',5000);}
   window.addEventListener('deviceorientation',onOri,true);
   if('ondeviceorientationabsolute' in window)window.addEventListener('deviceorientationabsolute',onAbs,true);
-  arMode='pass'; controls.enabled=false; camera.position.set(0,ORIGIN.h||0.002,0); setArVisuals(!!video.srcObject);
+  arMode='pass'; controls.enabled=false; camera.position.set(0,ORIGIN.h||0.002,0); setArVisuals(!!stream);
   video.onloadedmetadata=updateArFov; updateArFov();
   qReady=false;
 }
-function beginPhone(){
-  const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function');
-  if(ios){$('start').hidden=false;return;}
-  startAR();
+function grantFromFirstTap(){
+  document.removeEventListener('pointerdown',grantFromFirstTap,true);
+  $('start').hidden=true;
+  // Permission, camera, and play must be kicked off in this same tap.
+  const permP=DeviceOrientationEvent.requestPermission().catch(()=>'denied');
+  let camP; try{camP=cameraPromise();}catch(e){camP=Promise.reject(e);}
+  camP.then(stream=>{video.srcObject=stream;video.style.display='block';const p=video.play();if(p)p.catch(()=>{});}).catch(()=>{});
+  startGps();
+  startAR({permP,camP});
 }
-if(PHONE){beginPhone();$('btnStart').onclick=()=>{$('start').hidden=true;startAR();};}
+function beginPhone(){
+  startGps();
+  if(iosNeedsGesture()){$('start').hidden=false;document.addEventListener('pointerdown',grantFromFirstTap,true);return;}
+  startAR(null);
+}
+if(PHONE)beginPhone();
 
 // WebXR (Android): world in metres, yaw aligned from absolute compass if available, else "Align to tower"
 let xrNeedsYaw=false;
