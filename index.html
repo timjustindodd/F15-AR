@@ -58,6 +58,11 @@
   #info input[type=text],#info input[type=number]{background:#121418;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none;width:min(220px,70vw)}
   #info input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #F84D1E33}
   #msg{position:absolute;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:6px 8px;display:none;max-width:min(280px,86vw);text-align:center;font-family:var(--f-label);font-weight:600;font-size:13px;letter-spacing:.03em;z-index:6}
+  #tape,#hud{display:none}
+  body.telem #tape{display:block}
+  body.telem #hud{display:block;top:calc(env(safe-area-inset-top,0px) + 66px)}
+  #btnTelem{position:fixed;z-index:5;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);transform:translateX(-50%);min-height:28px;padding:3px 10px;font:600 12px/1 var(--f-label);letter-spacing:.03em;text-transform:none;color:var(--fg);background:rgba(22,24,28,.5);border:1px solid rgba(51,56,63,.85);border-radius:999px}
+  body.telem #btnTelem{top:calc(env(safe-area-inset-top,0px) + 32px)}
   #tape{position:fixed;z-index:4;top:env(safe-area-inset-top,0px);left:0;right:0;height:26px;background:rgba(22,24,28,.62);border:0;border-bottom:1px solid rgba(51,56,63,.9);border-radius:0;overflow:hidden;pointer-events:none}
   #tape-view{position:absolute;inset:0 46px 0 46px;overflow:hidden}
   #tape-ticks{position:absolute;top:0;height:100%;will-change:transform}
@@ -92,10 +97,13 @@
   .livebits div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(51,56,63,.6);padding:2px 0}
   .livebits span:first-child{color:var(--dim);font-family:var(--f-label);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
   #desk{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto;background:#16181c;font:800 clamp(28px,8vw,44px)/1.1 var(--f-label);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
-  #start{position:fixed;left:50%;bottom:calc(72px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:none;pointer-events:none;padding:6px 10px;border-radius:6px;background:rgba(22,24,28,.55);font:700 13px/1 var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--fg);white-space:nowrap}
+  #start{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:24px;pointer-events:none;background:rgba(8,10,14,.62);text-align:center}
+  #start span{display:block;max-width:16ch;font:800 clamp(32px,10vw,52px)/.95 "Barlow Condensed","Saira Semi Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 0 18px rgba(248,77,30,.55);animation:tapPulse 1.8s ease-in-out infinite}
+  @keyframes tapPulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+  @media (prefers-reduced-motion:reduce){#start span{animation:none;opacity:1}}
   body.desk #desk{display:flex}
   body.desk #c,body.desk #ui,body.desk #video{display:none!important}
-  body.phone #start:not([hidden]){display:block}
+  body.phone #start:not([hidden]){display:flex}
   @media (max-width:560px){
     #tlabel{display:none}
     #wm{width:84px}
@@ -115,10 +123,11 @@
 <video id="video" playsinline muted autoplay></video>
 <canvas id="c"></canvas>
 <div id="desk">Open on your phone</div>
-<div id="start" hidden>Tap to start</div>
+<div id="start" hidden><span>Tap anywhere to start</span></div>
 <div id="ui">
   <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
-  <div id="tape" aria-hidden="true">
+  <button id="btnTelem" class="p" type="button" aria-pressed="false">Show telemetry</button>
+  <div id="tape" hidden>
     <div id="tape-view"><div id="tape-ticks"></div><i id="mk-tower" class="tmk"></i><i id="mk-ship" class="tmk"></i><i id="mk-hor" class="tmk"></i></div>
     <div id="tape-lubber"></div>
     <div id="tape-read">—</div>
@@ -127,7 +136,7 @@
   <div id="reticle" aria-hidden="true"><b></b></div>
   <div id="aim">—</div>
   <div id="calhint">Move the phone in a figure-8 to calibrate the compass</div>
-  <div id="hud" class="panel">
+  <div id="hud" class="panel" hidden>
     <div class="hudline"><span id="phase">—</span> <span class="big" id="rT">—</span> <span id="rClock">—</span></div>
     <div class="hudline"><span id="rAlt">—</span> · <span id="rAzEl">—</span></div>
   </div>
@@ -150,7 +159,7 @@
     </ul>
     <h4>Limits</h4>
     <ul>
-      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. Camera, motion, and location are requested as soon as the page loads. On iPhone, the first tap anywhere allows motion and the camera. There is no AR button.</li>
+      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. The first tap anywhere starts the camera, motion, and location. On iPhone that tap is what allows motion. There is no AR button.</li>
       <li>iPhone Safari has no WebXR AR, so on iOS this uses camera passthrough + compass (iOS 13+ asks for Motion permission). Android Chrome uses WebXR <code>immersive-ar</code> when supported.</li>
       <li>Compass accuracy varies. On iPhone, heading is <code>webkitCompassHeading</code> (magnetic) plus declination. If accuracy is below 0 or worse than 20°, calibrate with a figure-8. Point the reticle at the real Pad 1 tower and tap <b>Align to tower</b>. The offset is saved on this phone.</li>
       <li>Declination is a south-Texas constant of <b>+2.5° E</b> (true = magnetic + east declination), not a full World Magnetic Model run. Edit it if you are somewhere else. It is applied only to the magnetic compass, not to <code>deviceorientationabsolute</code>.</li>
@@ -433,6 +442,8 @@ $('info').onclick=e=>e.stopPropagation();
 $('infoScrim').onclick=e=>{if(e.target===$('infoScrim'))closeInfo();};
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfo();$('alignpop').hidden=true;}});
 $('btnAlignMenu').onclick=e=>{e.stopPropagation();$('alignpop').hidden=!$('alignpop').hidden;};
+function setTelem(on){document.body.classList.toggle('telem',on);$('tape').hidden=$('hud').hidden=!on;$('btnTelem').textContent=on?'Hide telemetry':'Show telemetry';$('btnTelem').setAttribute('aria-pressed',String(on));}
+$('btnTelem').onclick=e=>{e.stopPropagation();setTelem(!document.body.classList.contains('telem'));};
 function toast(s,ms=3500){const m=$('msg');m.textContent=s;m.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>m.style.display='none',ms);}
 let gpsWatchId=null, gpsEst=null, gpsBuilt=null;
 function stopGps(){if(gpsWatchId!=null&&navigator.geolocation){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}}
@@ -542,17 +553,16 @@ async function startAR(pre){
 function grantFromFirstTap(){
   document.removeEventListener('pointerdown',grantFromFirstTap,true);
   $('start').hidden=true;
-  // Permission, camera, and play must be kicked off in this same tap.
-  const permP=DeviceOrientationEvent.requestPermission().catch(()=>'denied');
+  // Motion permission, the camera, and play are started in this same tap.
+  const permP=iosNeedsGesture()?DeviceOrientationEvent.requestPermission().catch(()=>'denied'):null;
   let camP; try{camP=cameraPromise();}catch(e){camP=Promise.reject(e);}
   camP.then(stream=>{video.srcObject=stream;video.style.display='block';const p=video.play();if(p)p.catch(()=>{});}).catch(()=>{});
   startGps();
   startAR({permP,camP});
 }
 function beginPhone(){
-  startGps();
-  if(iosNeedsGesture()){$('start').hidden=false;document.addEventListener('pointerdown',grantFromFirstTap,true);return;}
-  startAR(null);
+  $('start').hidden=false;
+  document.addEventListener('pointerdown',grantFromFirstTap,true);
 }
 if(PHONE)beginPhone();
 
