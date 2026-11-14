@@ -12,9 +12,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Saira+Semi+Condensed:wght@500;600;700&family=Share+Tech+Mono&display=swap">
 <style>
   /* Propulsive / Everyday Astronaut: flat charcoal, brand orange #F84D1E, Barlow Condensed + Share Tech Mono.
-     Watermark matches the game's #wm: Everyday Astronaut logo, top left, 132px, opacity .62. */
+     Watermark matches the game's #wm: Everyday Astronaut logo, top left, opacity .62. */
+  [hidden]{display:none!important}
   :root{
-    --bg:rgba(31,34,39,.92);
+    --bg:rgba(22,24,28,.55);
     --fg:#ecebe6;
     --dim:#9aa1aa;
     --acc:#F84D1E;
@@ -30,29 +31,24 @@
   #c{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block}
   #ui{position:fixed;inset:0;z-index:2;pointer-events:none}
   #ui .p{pointer-events:auto}
-  #wm{position:fixed;z-index:3;top:calc(env(safe-area-inset-top,0px) + 14px);left:max(16px,env(safe-area-inset-left,0px));width:132px;height:auto;opacity:.62;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
-  .panel{background:var(--bg);border:1px solid var(--line);border-radius:10px}
-  #top{position:absolute;left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));display:flex;gap:8px;align-items:flex-start;justify-content:space-between;padding-top:50px}
-  #title{padding:8px 12px}
-  #title b{font-family:var(--f-label);font-weight:800;font-size:18px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
-  .badge{display:inline-block;background:var(--acc);color:#fff;font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:2px 7px 1px;border-radius:4px;margin-left:8px;cursor:pointer;vertical-align:2px}
-  #title small{display:block;color:var(--dim);font-size:12px;margin-top:4px;letter-spacing:.01em;text-transform:none;font-weight:400}
-  #readout{padding:8px 12px;min-width:210px;font-family:var(--f-num);font-variant-numeric:tabular-nums}
-  #readout div{display:flex;justify-content:space-between;gap:12px}
-  #readout span:first-child{color:var(--dim);font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-  #readout span:last-child{white-space:nowrap}
-  #readout .big{font-size:18px;font-weight:400;color:var(--acc)}
-  #phase{font-family:var(--f-label);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;text-align:center;margin-bottom:4px;color:var(--fg)}
-  #bottom{position:absolute;left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));bottom:calc(8px + env(safe-area-inset-bottom));padding:8px;display:flex;flex-direction:column;gap:6px}
-  .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-  button{background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font:700 15px/1 var(--f-label);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:38px}
+  #wm{position:fixed;z-index:3;top:calc(env(safe-area-inset-top,0px) + 34px);left:max(8px,env(safe-area-inset-left,0px));width:86px;height:auto;opacity:.62;pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))}
+  .panel{background:var(--bg);border:1px solid rgba(51,56,63,.85);border-radius:8px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  #hud{position:absolute;z-index:3;top:calc(env(safe-area-inset-top,0px) + 34px);left:calc(max(8px,env(safe-area-inset-left,0px)) + 96px);right:calc(8px + env(safe-area-inset-right,0px));padding:4px 8px;font-family:var(--f-num);font-size:11px;line-height:1.35;color:var(--fg);pointer-events:none}
+  #hud .hudline{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #phase{font-family:var(--f-label);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  #hud .big{color:var(--acc);font-size:12px}
+  #bottom{position:absolute;left:calc(6px + env(safe-area-inset-left));right:calc(6px + env(safe-area-inset-right));bottom:calc(6px + env(safe-area-inset-bottom));padding:4px 6px;display:flex;flex-direction:row;gap:4px;align-items:center}
+  .row{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;min-width:0}
+  #bottom > .row{flex:1}
+  button{background:rgba(38,42,48,.72);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 7px;font:700 12px/1 var(--f-label);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;min-height:32px}
   button.on{background:var(--acc);color:var(--ink);border-color:var(--acc)}
   button:active{transform:scale(.97)}
-  #scrub{flex:1;min-width:140px;accent-color:var(--acc);height:30px}
-  #tlabel{font-family:var(--f-num);font-variant-numeric:tabular-nums;min-width:118px;text-align:right;color:var(--dim);font-size:12px}
-  #legend{display:flex;align-items:center;gap:6px;font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  #scrub{flex:1;min-width:72px;accent-color:var(--acc);height:22px}
+  #tlabel{font-family:var(--f-num);font-variant-numeric:tabular-nums;min-width:0;text-align:right;color:var(--dim);font-size:10px;white-space:nowrap}
+  #legend{display:flex;align-items:center;gap:6px;font-family:var(--f-label);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:.4em 0}
   #legend i{display:inline-block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,#29d3ff,#4dff88 30%,#ffe14d 45%,#ff8c1a 65%,#ff2d55 85%,#d14dff)}
-  #info{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,92vw);max-height:80vh;overflow:auto;padding:16px 18px;display:none;-webkit-user-select:text;user-select:text}
+  #infoScrim{position:fixed;inset:0;z-index:8;background:rgba(0,0,0,.4);pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
+  #info{position:relative;width:min(560px,100%);max-height:100%;overflow:auto;padding:14px 16px 16px;-webkit-user-select:text;user-select:text}
   #info h3,#info h4{font-family:var(--f-head);font-weight:700;letter-spacing:.02em}
   #info h3{margin:.2em 0 .4em;color:var(--acc);font-size:22px}
   #info h4{margin:.8em 0 .2em;font-size:16px;text-transform:uppercase;letter-spacing:.08em}
@@ -61,45 +57,54 @@
   #info label{display:block;margin:.5em 0;font-family:var(--f-label);font-weight:600;font-size:14px;letter-spacing:.02em;color:var(--dim)}
   #info input[type=text],#info input[type=number]{background:#121418;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:15px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none;width:min(220px,70vw)}
   #info input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #F84D1E33}
-  #msg{position:absolute;left:50%;top:calc(108px + env(safe-area-inset-top));transform:translateX(-50%);padding:8px 12px;display:none;max-width:90vw;text-align:center;font-family:var(--f-label);font-weight:600;letter-spacing:.04em;z-index:6}
-  #tape{position:fixed;z-index:4;top:calc(env(safe-area-inset-top,0px) + 8px);left:calc(156px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));height:40px;background:rgba(22,24,28,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;pointer-events:none}
-  #tape-view{position:absolute;inset:0 0 14px 0;overflow:hidden}
+  #msg{position:absolute;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:6px 8px;display:none;max-width:min(280px,86vw);text-align:center;font-family:var(--f-label);font-weight:600;font-size:13px;letter-spacing:.03em;z-index:6}
+  #tape{position:fixed;z-index:4;top:env(safe-area-inset-top,0px);left:0;right:0;height:26px;background:rgba(22,24,28,.62);border:0;border-bottom:1px solid rgba(51,56,63,.9);border-radius:0;overflow:hidden;pointer-events:none}
+  #tape-view{position:absolute;inset:0 46px 0 46px;overflow:hidden}
   #tape-ticks{position:absolute;top:0;height:100%;will-change:transform}
-  #tape-ticks i{position:absolute;top:0;width:1px;height:8px;background:#33383f;font-family:var(--f-num);font-size:11px;color:var(--fg);font-style:normal;text-align:center}
-  #tape-ticks i.lab{height:12px;background:var(--acc);color:var(--fg)}
-  #tape-ticks i.lab::after{content:attr(data-t);position:absolute;top:12px;left:0;transform:translateX(-50%);white-space:nowrap;letter-spacing:.04em}
-  #tape-lubber{position:absolute;left:50%;top:0;bottom:14px;width:2px;margin-left:-1px;background:var(--acc);box-shadow:0 0 6px #F84D1E}
-  #tape-read{position:absolute;left:6px;bottom:1px;font:12px/1 var(--f-num);color:var(--acc)}
-  #tape-el{position:absolute;right:6px;bottom:1px;font:12px/1 var(--f-num);color:var(--fg)}
-  .tmk{position:absolute;top:0;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;margin-left:-5px;z-index:2}
-  #mk-tower{border-top:8px solid var(--acc)}
-  #mk-ship{border-top:8px solid #fff;top:9px}
-  #mk-hor{border-top:8px solid #9fe3ff;top:18px}
-  #reticle{position:fixed;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;z-index:4;pointer-events:none}
-  #reticle::before,#reticle::after{content:"";position:absolute;background:var(--acc);box-shadow:0 0 2px #000}
+  #tape-ticks i{position:absolute;top:0;width:1px;height:6px;background:#4a515c;font-family:var(--f-num);font-size:9px;color:var(--fg);font-style:normal}
+  #tape-ticks i.lab{height:7px;background:var(--acc)}
+  #tape-ticks i.lab::after{content:attr(data-t);position:absolute;top:7px;left:0;transform:translateX(-50%);white-space:nowrap;font-size:9px;letter-spacing:0}
+  #tape-lubber{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--acc)}
+  #tape-read,#tape-el{position:absolute;top:0;bottom:0;display:flex;align-items:center;font:10px/1 var(--f-num);background:rgba(22,24,28,.78);z-index:3;padding:0 4px}
+  #tape-read{left:0;color:var(--acc)}
+  #tape-el{right:0;color:var(--fg)}
+  .tmk{position:absolute;top:0;width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;margin-left:-3px;z-index:2}
+  #mk-tower{border-top:5px solid var(--acc)}
+  #mk-ship{border-top:5px solid #fff;top:6px}
+  #mk-hor{border-top:5px solid rgba(159,227,255,.85);top:12px}
+  #reticle{position:fixed;left:50%;top:46%;width:18px;height:18px;margin:-9px 0 0 -9px;z-index:4;pointer-events:none;opacity:.8}
+  #reticle::before,#reticle::after{content:"";position:absolute;background:rgba(248,77,30,.85)}
   #reticle::before{left:50%;top:0;bottom:0;width:1px;margin-left:-0.5px}
   #reticle::after{top:50%;left:0;right:0;height:1px;margin-top:-0.5px}
-  #reticle b{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border:1px solid var(--acc);border-radius:50%}
-  #aim{position:fixed;left:50%;top:calc(50% + 22px);transform:translateX(-50%);z-index:4;pointer-events:none;font:13px/1.3 var(--f-num);color:var(--fg);text-shadow:0 1px 2px #000;white-space:nowrap;background:rgba(22,24,28,.72);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
-  #calhint{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 56px);transform:translateX(-50%);z-index:6;display:none;max-width:92vw;text-align:center;padding:6px 10px;font-family:var(--f-label);font-weight:700;letter-spacing:.06em;color:#fff;background:rgba(248,77,30,.92);border:0}
-  #arrow,#arrowTower{position:absolute;width:0;height:0;display:none;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:26px solid var(--acc);filter:drop-shadow(0 0 4px #000);transform-origin:50% 60%;z-index:5}
-  #arrowTower{border-bottom-color:#9fe3ff}
-  #arrow span,#arrowTower span{position:absolute;left:-18px;top:28px;width:36px;text-align:center;font:10px/1 var(--f-label);letter-spacing:.08em;color:#fff}
-  #arbar{display:none}
-  body.ar #arbar{display:flex}
-  body.ar .noar{display:none!important}
-  #hdgTxt{font-family:var(--f-num)!important;letter-spacing:0!important;text-transform:none!important}
+  #reticle b{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border:1px solid rgba(248,77,30,.9);border-radius:50%}
+  #aim{position:fixed;left:50%;top:calc(46% + 14px);transform:translateX(-50%);z-index:4;pointer-events:none;font:11px/1.2 var(--f-num);color:var(--fg);white-space:nowrap;background:rgba(22,24,28,.45);border-radius:4px;padding:2px 6px}
+  #calhint{position:fixed;left:50%;bottom:calc(48px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:none;max-width:92vw;text-align:center;padding:4px 8px;font-family:var(--f-label);font-weight:700;font-size:12px;letter-spacing:.04em;color:#fff;background:rgba(248,77,30,.88);border:0;border-radius:6px}
+  #arrow,#arrowTower{position:absolute;width:0;height:0;display:none;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:13px solid rgba(248,77,30,.8);filter:drop-shadow(0 0 2px rgba(0,0,0,.65));transform-origin:50% 60%;z-index:5}
+  #arrowTower{border-bottom-color:rgba(159,227,255,.8)}
+  #arrow span,#arrowTower span{position:absolute;left:-14px;top:14px;width:28px;text-align:center;font:8px/1 var(--f-label);letter-spacing:.06em;color:rgba(255,255,255,.85)}
+  #alignpop{position:absolute;right:calc(6px + env(safe-area-inset-right));bottom:calc(46px + env(safe-area-inset-bottom));z-index:7;padding:8px;display:flex;flex-wrap:wrap;gap:4px;max-width:min(280px,92vw)}
+  #alignpop[hidden]{display:none!important}
+  #hdgTxt{flex:1 1 100%;font:11px/1.3 var(--f-num)!important;letter-spacing:0!important;text-transform:none!important;color:var(--dim)}
+  #btnCloseInfo{position:absolute;top:8px;right:8px;width:32px;height:32px;min-height:32px;padding:0;font-size:22px;line-height:1;letter-spacing:0;text-transform:none;border-radius:50%}
+  #btnInfo{text-transform:none;letter-spacing:.01em}
+  #info h3{padding-right:36px}
+  .livebits{font-family:var(--f-num);font-size:12px;color:var(--fg);line-height:1.45}
+  .livebits div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(51,56,63,.6);padding:2px 0}
+  .livebits span:first-child{color:var(--dim);font-family:var(--f-label);letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+  #desk,#start{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:auto}
+  #desk{background:#16181c;font:800 clamp(28px,8vw,44px)/1.1 var(--f-label);letter-spacing:.04em;text-transform:uppercase;color:var(--fg)}
+  #start{background:rgba(8,10,14,.82)}
+  #start p{margin:0 0 14px;font:700 13px/1.3 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  #start button{min-height:52px;padding:14px 28px;font-size:22px;background:var(--acc);color:var(--ink);border:0}
+  body.desk #desk{display:flex}
+  body.desk #c,body.desk #ui,body.desk #video{display:none!important}
+  body.phone #start:not([hidden]){display:flex}
   @media (max-width:560px){
-    #wm{width:100px}
-    #tape{left:calc(8px + env(safe-area-inset-left,0px));top:calc(env(safe-area-inset-top,0px) + 36px)}
-    #top{flex-direction:column;align-items:stretch;padding-top:78px}
-    #title small{display:none}
-    #title b{font-size:15px}
-    #readout{min-width:0;font-size:11px;display:grid;grid-template-columns:1fr 1fr;column-gap:8px}
-    #readout #phase{grid-column:1/3}
-    #readout .big{font-size:15px}
-    #readout span:first-child{font-size:11px}
-    #legend i{width:80px}
+    #tlabel{display:none}
+    #wm{width:84px}
+    #wm{top:calc(env(safe-area-inset-top,0px) + 32px)}
+    #hud{top:calc(env(safe-area-inset-top,0px) + 32px);left:calc(max(6px,env(safe-area-inset-left,0px)) + 100px);font-size:10px}
+    #hud .big{font-size:11px}
   }
 </style>
 <script type="importmap">
@@ -112,6 +117,13 @@
 <body>
 <video id="video" playsinline muted autoplay></video>
 <canvas id="c"></canvas>
+<div id="desk">Open on your phone</div>
+<div id="start" hidden>
+  <div>
+    <p>Flight 15 · camera</p>
+    <button id="btnStart" type="button">Tap to start</button>
+  </div>
+</div>
 <div id="ui">
   <img id="wm" src="assets/ea-logo.png" alt="" width="900" height="218" aria-hidden="true">
   <div id="tape" aria-hidden="true">
@@ -123,26 +135,16 @@
   <div id="reticle" aria-hidden="true"><b></b></div>
   <div id="aim">—</div>
   <div id="calhint">Move the phone in a figure-8 to calibrate the compass</div>
-  <div id="top">
-    <div id="title" class="panel p"><b>Starship Flight 15 · Ship return &amp; catch</b><span class="badge" id="approxBadge">STAR DASH SIM</span>
-      <small>Path from the StarDash Flight 15 simulation (SpaceX timeline + Flight 14 entry + physics), not live return telemetry. Tap ⓘ for sources &amp; limits.</small></div>
-    <div id="readout" class="panel p">
-      <div id="phase">—</div>
-      <div><span>To catch</span><span class="big" id="rT">—</span></div>
-      <div><span>Clock (CT)</span><span id="rClock">—</span></div>
-      <div><span>Altitude</span><span id="rAlt">—</span></div>
-      <div><span>Speed</span><span id="rSpd">—</span></div>
-      <div><span>Look (az / el)</span><span id="rAzEl">—</span></div>
-      <div><span>Range</span><span id="rRng">—</span></div>
-      <div><span>Pad 1</span><span id="rTower">—</span></div>
-      <div><span>First up</span><span id="rHor">—</span></div>
-      <div><span>GPS</span><span id="rGps">Outpost</span></div>
-    </div>
+  <div id="hud" class="panel">
+    <div class="hudline"><span id="phase">—</span> <span class="big" id="rT">—</span> <span id="rClock">—</span></div>
+    <div class="hudline"><span id="rAlt">—</span> · <span id="rAzEl">—</span></div>
   </div>
   <div id="msg" class="panel"></div>
   <div id="arrow"><span>SHIP</span></div>
   <div id="arrowTower"><span>PAD</span></div>
+  <div id="infoScrim" hidden>
   <div id="info" class="panel p">
+    <button id="btnCloseInfo" type="button" aria-label="Close">×</button>
     <h3>Flight 15 ship return – what you're looking at</h3>
     <p><b>The path is a simulation, not live return telemetry.</b> Coordinates come from the StarDash Flight 15 simulation (<a href="https://stardash.live/" target="_blank">stardash.live</a>), which StarDash describes as built from SpaceX's Flight 15 mission video and published timeline, the recorded entry of Flight 14, and physics. When this copy was checked (late morning CT, Sat Nov 14), Ship 42 was still in orbit; the return and catch had not happened yet.</p>
     <h4>What it's based on</h4>
@@ -156,45 +158,46 @@
     </ul>
     <h4>Limits</h4>
     <ul>
-      <li>Camera + motion sensors need <b>HTTPS</b> (or localhost). Opened as a file:// page, only the 3D view works.</li>
+      <li>This page is the phone camera view. On a computer it asks you to open it on your phone. Camera and motion need <b>HTTPS</b>. iPhone asks once, on the tap-to-start button.</li>
       <li>iPhone Safari has no WebXR AR, so on iOS this uses camera passthrough + compass (iOS 13+ asks for Motion permission). Android Chrome uses WebXR <code>immersive-ar</code> when supported.</li>
       <li>Compass accuracy varies. On iPhone, heading is <code>webkitCompassHeading</code> (magnetic) plus declination. If accuracy is below 0 or worse than 20°, calibrate with a figure-8. Point the reticle at the real Pad 1 tower and tap <b>Align to tower</b>. The offset is saved on this phone.</li>
       <li>Declination is a south-Texas constant of <b>+2.5° E</b> (true = magnetic + east declination), not a full World Magnetic Model run. Edit it if you are somewhere else. It is applied only to the magnetic compass, not to <code>deviceorientationabsolute</code>.</li>
       <li>The portrait vertical field of view defaults to 63°, a typical iPhone 1× rear camera. Adjust it if the tower doesn't match the video.</li>
       <li>Earth curvature is included in az/el; atmospheric refraction is not.</li>
     </ul>
+    <h4>Bearings</h4>
+    <div class="livebits">
+      <div><span>Speed</span><span id="rSpd">—</span></div>
+      <div><span>Range</span><span id="rRng">—</span></div>
+      <div><span>Pad 1</span><span id="rTower">—</span></div>
+      <div><span>First up</span><span id="rHor">—</span></div>
+      <div><span>GPS</span><span id="rGps">Outpost</span></div>
+    </div>
     <h4>Settings</h4>
     <label>Catch time (CT, edit if it slips): <input type="text" id="catchInput" value="2026-11-14 15:20:10"></label>
-    <label>Viewer: <button id="btnGPS">Use my GPS location</button> <button id="btnRRO">Reset to Rocket Ranch Outpost</button> <span id="viewerTxt"></span></label>
+    <label>Viewer: <button id="btnGPS" type="button">Use my GPS location</button> <button id="btnRRO" type="button">Reset to Rocket Ranch Outpost</button> <span id="viewerTxt"></span></label>
     <label>Portrait vertical FOV (°): <input type="number" id="fovInput" value="63" min="40" max="90" step="0.5"></label>
     <label>Magnetic declination (°E, south Texas): <input type="number" id="declInput" value="2.5" step="0.1"></label>
-    <p><button id="btnCloseInfo">Close</button></p>
+    <label>Playback: <button id="btnRate" type="button">1×</button> <span id="tlabel">—</span></label>
+    <div id="legend"><span>slow</span><i></i><span>Mach 10+</span></div>
+  </div>
+  </div>
+  <div id="alignpop" class="panel p" hidden>
+    <button id="btnAlign" type="button">Align to tower</button>
+    <button id="btnL5" type="button">⟲ 0.5°</button>
+    <button id="btnL" type="button">⟲ 2°</button>
+    <button id="btnR" type="button">2° ⟳</button>
+    <button id="btnR5" type="button">0.5° ⟳</button>
+    <button id="btnPup" type="button">Pitch +0.5°</button>
+    <button id="btnPdn" type="button">Pitch −0.5°</button>
+    <span id="hdgTxt"></span>
   </div>
   <div id="bottom" class="panel p">
-    <div class="row">
-      <button id="btnPlay">▶︎ Play</button>
-      <button id="btnRate">1×</button>
-      <input id="scrub" type="range" min="-720" max="30" step="0.5" value="-200">
-      <span id="tlabel">—</span>
-    </div>
-    <div class="row">
-      <button id="btnLive">Live</button>
-      <button id="btnAR">AR</button>
-      <button id="btnReset" class="noar">Reset view</button>
-      <button id="btnFull" class="noar">Whole path</button>
-      <button id="btnInfo">ⓘ</button>
-      <span id="legend" class="noar"><span>slow</span><i></i><span>Mach 10+</span></span>
-    </div>
-    <div class="row" id="arbar">
-      <button id="btnAlign">Align to tower</button>
-      <button id="btnL5">⟲ 0.5°</button>
-      <button id="btnL">⟲ 2°</button>
-      <button id="btnR">2° ⟳</button>
-      <button id="btnR5">0.5° ⟳</button>
-      <button id="btnPup">Pitch +0.5°</button>
-      <button id="btnPdn">Pitch −0.5°</button>
-      <span id="hdgTxt" style="font-size:12px;color:var(--dim)"></span>
-    </div>
+    <button id="btnPlay" type="button">▶</button>
+    <input id="scrub" type="range" min="-720" max="30" step="0.5" value="-200" aria-label="Time">
+    <button id="btnLive" type="button">Live</button>
+    <button id="btnAlignMenu" type="button">Align</button>
+    <button id="btnInfo" type="button">Info</button>
   </div>
 </div>
 
@@ -204,6 +207,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+const PHONE=/iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent);
+document.body.classList.add(PHONE?'phone':'desk');
 
 // ---------------------------------------------------------------- data
 const GEO = {"river":[[26.0131,-97.6384],[26.0122,-97.6444],[26.0067,-97.645],[26.0038,-97.6395],[26.0,-97.6351],[26.005,-97.6307],[25.9994,-97.6278],[25.9993,-97.6214],[25.9943,-97.6188],[25.9943,-97.6248],[25.9966,-97.6305],[25.9919,-97.6345],[25.988,-97.6302],[25.9896,-97.6238],[25.9847,-97.6202],[25.9792,-97.6167],[25.9778,-97.6105],[25.9723,-97.6078],[25.967,-97.6105],[25.9625,-97.6064],[25.9582,-97.6026],[25.9594,-97.5966],[25.962,-97.5911],[25.9619,-97.5851],[25.9562,-97.5831],[25.9508,-97.5813],[25.9455,-97.5801],[25.9439,-97.5742],[25.9498,-97.5731],[25.9518,-97.5675],[25.9461,-97.5659],[25.9435,-97.5714],[25.9409,-97.5775],[25.9381,-97.5827],[25.9327,-97.5824],[25.9345,-97.5766],[25.9343,-97.5705],[25.9295,-97.5677],[25.9257,-97.5633],[25.9304,-97.5595],[25.9359,-97.5573],[25.9369,-97.5513],[25.9338,-97.546],[25.9277,-97.5452],[25.929,-97.5391],[25.9234,-97.5411],[25.9201,-97.5362],[25.9199,-97.5301],[25.9142,-97.5322],[25.9088,-97.5333],[25.9059,-97.5282],[25.9007,-97.5255],[25.8958,-97.5229],[25.8902,-97.5235],[25.886,-97.5198],[25.8874,-97.5137],[25.8895,-97.5078],[25.8934,-97.5032],[25.8982,-97.4994],[25.8931,-97.4965],[25.8878,-97.4976],[25.8823,-97.4975],[25.882,-97.4914],[25.8784,-97.4863],[25.8805,-97.4807],[25.8842,-97.4756],[25.8885,-97.4708],[25.8834,-97.4688],[25.8803,-97.4741],[25.8753,-97.4715],[25.879,-97.4668],[25.8829,-97.4621],[25.8842,-97.4559],[25.8789,-97.4548],[25.8728,-97.456],[25.8673,-97.4555],[25.8711,-97.4509],[25.869,-97.4454],[25.8638,-97.4472],[25.859,-97.4503],[25.8543,-97.4541],[25.856,-97.4484],[25.8509,-97.4458],[25.8483,-97.4404],[25.8483,-97.4342],[25.8438,-97.4297],[25.8404,-97.4244],[25.8409,-97.4181],[25.8418,-97.4122],[25.8469,-97.4145],[25.853,-97.4137],[25.8587,-97.4133],[25.8621,-97.4086],[25.8564,-97.4087],[25.8511,-97.4103],[25.8453,-97.408],[25.85,-97.4044],[25.8452,-97.4008],[25.8402,-97.4033],[25.8382,-97.3975],[25.8383,-97.3912],[25.8433,-97.3879],[25.8398,-97.3824],[25.8404,-97.3761],[25.8452,-97.3721],[25.8504,-97.3699],[25.8504,-97.3639],[25.8543,-97.3683],[25.854,-97.3744],[25.8578,-97.3699],[25.8631,-97.3666],[25.8675,-97.3631],[25.8667,-97.3571],[25.8723,-97.3593],[25.878,-97.3585],[25.8778,-97.3648],[25.8782,-97.3719],[25.8835,-97.3699],[25.8858,-97.3643],[25.8862,-97.3582],[25.8897,-97.363],[25.8935,-97.3674],[25.8989,-97.3663],[25.9039,-97.3694],[25.9065,-97.375],[25.909,-97.3693],[25.9146,-97.3693],[25.9157,-97.3629],[25.9182,-97.3572],[25.9218,-97.3526],[25.9267,-97.3496],[25.9292,-97.3442],[25.9298,-97.3375],[25.9242,-97.3375],[25.9226,-97.3318],[25.9177,-97.3289],[25.9225,-97.3252],[25.9277,-97.3225],[25.9313,-97.318],[25.9298,-97.3122],[25.9268,-97.307],[25.9321,-97.3044],[25.9375,-97.3025],[25.9336,-97.2974],[25.9365,-97.2915],[25.936,-97.2847],[25.935,-97.2787],[25.9409,-97.2778],[25.9459,-97.2801],[25.9495,-97.2849],[25.9536,-97.2893],[25.9588,-97.2855],[25.9557,-97.2805],[25.952,-97.276],[25.9516,-97.2685],[25.9512,-97.2622],[25.9494,-97.2558],[25.9484,-97.2498],[25.9516,-97.2446],[25.9556,-97.2392],[25.9569,-97.2329],[25.9593,-97.2274],[25.9571,-97.2213],[25.9596,-97.2151],[25.9632,-97.2102],[25.9589,-97.2059],[25.9584,-97.1999],[25.9558,-97.1941],[25.9539,-97.1884],[25.9594,-97.1856],[25.9611,-97.179],[25.9659,-97.176],[25.9619,-97.1711],[25.9602,-97.1653],[25.9622,-97.1595],[25.9556,-97.1589],[25.9503,-97.1603],[25.9501,-97.1543],[25.9531,-97.1488],[25.9563,-97.1474]],"gulf":[[25.7978,-97.1559],[25.8212,-97.1522],[25.8264,-97.1515],[25.8333,-97.1506],[25.848,-97.149],[25.8594,-97.1477],[25.8635,-97.1473],[25.8671,-97.1469],[25.8709,-97.1466],[25.8755,-97.1463],[25.8801,-97.1459],[25.884,-97.1457],[25.8884,-97.1454],[25.8927,-97.1453],[25.8969,-97.1453],[25.9019,-97.1451],[25.9057,-97.145],[25.9093,-97.145],[25.913,-97.145],[25.917,-97.1451],[25.9211,-97.1452],[25.9253,-97.1453],[25.9298,-97.1454],[25.9341,-97.1456],[25.9382,-97.1457],[25.942,-97.1459],[25.9476,-97.1462],[25.9522,-97.1467],[25.9563,-97.1474],[25.9602,-97.1473],[25.9659,-97.1478],[25.9695,-97.1481],[25.9736,-97.1482],[25.9776,-97.1487],[25.9851,-97.1494],[25.992,-97.1501],[25.9975,-97.1505],[26.0013,-97.1507],[26.0071,-97.1512],[26.0114,-97.1516],[26.0187,-97.1522],[26.0238,-97.1524],[26.029,-97.1526],[26.034,-97.1528],[26.039,-97.1529],[26.0444,-97.1528],[26.0489,-97.1527],[26.0527,-97.1524],[26.0571,-97.1519],[26.0608,-97.151],[26.0643,-97.1499],[26.0675,-97.1543]],"spi":[[26.0675,-97.1543],[26.073,-97.1562],[26.0804,-97.1583],[26.0859,-97.1597],[26.092,-97.161],[26.101,-97.1626],[26.1115,-97.1641],[26.1224,-97.166],[26.1292,-97.1671],[26.1358,-97.168],[26.1413,-97.1688],[26.1592,-97.1713],[26.1646,-97.172],[26.1736,-97.1734],[26.1821,-97.1744],[26.1946,-97.1759],[26.2102,-97.178],[26.2158,-97.179],[26.2258,-97.1808],[26.2392,-97.1831],[26.2648,-97.1884],[26.2704,-97.1895],[26.2847,-97.1928],[26.2938,-97.1948],[26.3026,-97.1967],[26.3087,-97.1981],[26.3164,-97.2],[26.3228,-97.2016],[26.3311,-97.2037],[26.3392,-97.2058],[26.3508,-97.2089],[26.3562,-97.2104],[26.3686,-97.2137],[26.3762,-97.2156],[26.3826,-97.2172],[26.3901,-97.2195],[26.3956,-97.221],[26.4067,-97.2239],[26.4122,-97.2254],[26.4232,-97.2284],[26.4444,-97.2353],[26.4562,-97.2391],[26.4681,-97.2427],[26.4748,-97.2451],[26.4805,-97.2469],[26.4868,-97.2492],[26.4977,-97.2525],[26.5077,-97.2556],[26.52,-97.2596],[26.527,-97.2617],[26.5459,-97.2677],[26.5545,-97.2697],[26.5613,-97.2704],[26.5622,-97.276]]};
@@ -369,45 +374,19 @@ function lineFromLatLon(pts,color,h=0.01,opacity=1){const g=new THREE.BufferGeom
 function buildWorld(){
   world.clear();
   groundGroup=new THREE.Group(); pathGroup=new THREE.Group(); labelGroup=new THREE.Group(); world.add(groundGroup,pathGroup,labelGroup);
-  // Earth cap (curved) far backdrop
-  const R=6371;const cap=new THREE.Mesh(new THREE.SphereGeometry(R,192,64,0,Math.PI*2,0,0.2),new THREE.MeshLambertMaterial({color:'#4f5a37'}));
-  cap.position.set(0,-R-0.4,0);groundGroup.add(cap);
-  // Ocean disk
-  const ocean=new THREE.Mesh(new THREE.CircleGeometry(300,96),new THREE.MeshLambertMaterial({color:'#0f4c75'}));ocean.rotation.x=-Math.PI/2;ocean.position.set(240,-0.02,0);groundGroup.add(ocean);
-  // Mainland polygon: Gulf coast (south->north to the pass), Laguna Madre shore north, then far west box
-  const gulf=GEO.gulf; const main=[[25.30,-97.40],[25.60,-97.22],...gulf,...LAGUNA_SHORE.slice(1),[27.2,-98.9],[25.3,-98.9]];
-  const mshape=new THREE.Shape(polyToShapeXY(main));
-  const landMat=new THREE.MeshLambertMaterial({color:'#4f5a37'});
-  const land=new THREE.Mesh(new THREE.ShapeGeometry(mshape),landMat);land.rotation.x=-Math.PI/2;groundGroup.add(land);
-  // Barrier island (South Padre / Padre Island): Gulf side from OSM, lagoon side offset
-  const spi=GEO.spi.concat([[26.80,-97.33],[27.2,-97.37]]); const inner=spi.map((p,i)=>[p[0],p[1]-(0.008+0.018*Math.min(1,(p[0]-26.06)/0.4))]).reverse();
-  const ishape=new THREE.Shape(polyToShapeXY(spi.concat(inner)));
-  const isl=new THREE.Mesh(new THREE.ShapeGeometry(ishape),new THREE.MeshLambertMaterial({color:'#d9c98f'}));isl.rotation.x=-Math.PI/2;isl.position.y=0.002;groundGroup.add(isl);
-  // coast + river lines
-  groundGroup.add(lineFromLatLon(GEO.gulf,'#f3e2a9',0.01));
-  groundGroup.add(lineFromLatLon(GEO.spi,'#f3e2a9',0.01));
-  groundGroup.add(lineFromLatLon(GEO.river,'#6ec6ff',0.012));
+  groundGroup.visible=false;
   // Pad 1 tower (143 m mast) and catch arms at 90 m
   const tw=enu(SITES.tower.lat,SITES.tower.lon,0);
   const tower=new THREE.Mesh(new THREE.BoxGeometry(0.02,TOWER_H,0.02),new THREE.MeshLambertMaterial({color:'#cfd6e6'}));tower.position.copy(tw).add(new THREE.Vector3(0,TOWER_H/2,0));world.add(tower);
   const arms=new THREE.Mesh(new THREE.BoxGeometry(0.09,0.006,0.018),new THREE.MeshBasicMaterial({color:'#F84D1E'}));arms.position.copy(tw).add(new THREE.Vector3(0,CATCH_H,0));world.add(arms);
-  // site markers + labels
-  for(const [k,s] of Object.entries(SITES)){
-    if(k==='rro'&&ORIGIN.lat!==SITES.rro.lat){} 
-    const p=enu(s.lat,s.lon,0);
-    const big=['rro','tower'].includes(k);
-    const pole=new THREE.Mesh(new THREE.CylinderGeometry(big?0.02:0.04,big?0.02:0.04,big?0.6:1.2,8),new THREE.MeshBasicMaterial({color:s.color}));
-    pole.position.copy(p).add(new THREE.Vector3(0,big?0.3:0.6,0));labelGroup.add(pole);
-    const lab=makeLabel(s.name,s.color,big?1:0.85);lab.position.copy(p).add(new THREE.Vector3(0,big?0.6:1.2,0));lab.userData.site=k;labelGroup.add(lab);
-  }
-  if(ORIGIN.lat!==SITES.rro.lat){const p=new THREE.Vector3(0,0.3,0);const lab=makeLabel('YOU (GPS)','#7dff9a');lab.position.copy(p);labelGroup.add(lab);}
+  const towerLab=makeLabel('Pad 1 tower','#F84D1E',1.1);towerLab.position.copy(tw).add(new THREE.Vector3(0,CATCH_H+0.04,0));labelGroup.add(towerLab);
   // trajectory points
   const pts=[],cols=[],step=4; // every 2 s
   for(let i=0;i<SAMPLES.length;i+=step){const s=SAMPLES[i];if(s.t>0)break;pts.push(enu(s.lat,s.lon,s.h));cols.push(machColor(s.v/soundSpeed(s.h)));}
   pts.push(enu(SITES.tower.lat,SITES.tower.lon,CATCH_H)); cols.push(machColor(0));
   // tube
   const curve=new THREE.CatmullRomCurve3(pts,false,'centripetal');
-  const segs=1400, tube=new THREE.TubeGeometry(curve,segs,0.09,8,false);
+  const segs=1400, tube=new THREE.TubeGeometry(curve,segs,0.14,8,false);
   // colour rings by nearest sample (arc-length param)
   const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+pts[i].distanceTo(pts[i-1]));const Ltot=cum[cum.length-1];
   const colorArr=new Float32Array(tube.attributes.position.count*3);
@@ -417,11 +396,8 @@ function buildWorld(){
   const tubeMesh=new THREE.Mesh(tube,new THREE.MeshBasicMaterial({vertexColors:true}));tubeMesh.name='tube';pathGroup.add(tubeMesh);
   // screen-space line (always visible, thicker in AR)
   const lg=new LineGeometry();lg.setPositions(pts.flatMap(p=>[p.x,p.y,p.z]));lg.setColors(cols.flatMap(c=>[c.r,c.g,c.b]));
-  const lm=new LineMaterial({vertexColors:true,linewidth:2.5,worldUnits:false,transparent:true,opacity:0.95});lm.resolution.set(innerWidth,innerHeight);
+  const lm=new LineMaterial({vertexColors:true,linewidth:6,worldUnits:false,transparent:true,opacity:1});lm.resolution.set(innerWidth,innerHeight);
   const line=new Line2(lg,lm);line.computeLineDistances();line.name='line';line.renderOrder=5;pathGroup.add(line);
-  // ground track shadow + drop lines near the end
-  const gt=[];for(let i=0;i<SAMPLES.length;i+=8){const s=SAMPLES[i];if(s.t>0)break;gt.push([s.lat,s.lon]);}
-  const shadow=lineFromLatLon(gt,'#ffffff',0.015,0.35);shadow.name='groundtrack';groundGroup.add(shadow);
   // event markers
   for(const ev of EVENTS){const s=sampleAt(ev.t);const p=enu(s.lat,s.lon,s.h);const d=dotSprite('#ffffff',0.016);d.position.copy(p);pathGroup.add(d);
     if(ev.t<0){const lab=makeLabel(ev.name,'#ffe14d',0.8);lab.position.copy(p);if(ev.t>-30){lab.center.set(0,0);lab.position.y+=1.0;}pathGroup.add(lab);}
@@ -430,16 +406,16 @@ function buildWorld(){
   {const s=sampleAt(-235);const lab=makeLabel('Passes N of South Padre Island → Gulf → final turn south','#9fe3ff',0.75);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   {const s=sampleAt(-480);const lab=makeLabel('Hypersonic glide over N. Mexico (approx.)','#ff8c9a',0.8);lab.position.copy(enu(s.lat,s.lon,s.h));pathGroup.add(lab);}
   // ship
-  shipObj=new THREE.Group();const sd=dotSprite('#ffb347',0.05);shipObj.add(sd);const sl=makeLabel('SHIP','#ffb347',0.9);sl.position.y=0;shipObj.add(sl);shipObj.userData.label=sl;
-  const sphere=new THREE.Mesh(new THREE.SphereGeometry(0.12,16,12),new THREE.MeshBasicMaterial({color:'#ffb347'}));shipObj.add(sphere);world.add(shipObj);
+  shipObj=new THREE.Group();const sd=dotSprite('#ffe7b0',0.09);shipObj.add(sd);const sl=makeLabel('SHIP','#F84D1E',1.15);sl.position.y=0;shipObj.add(sl);shipObj.userData.label=sl;
+  const sphere=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,12),new THREE.MeshBasicMaterial({color:'#F84D1E'}));sphere.visible=false;shipObj.add(sphere);world.add(shipObj);
   refreshHorizon();
 }
 buildWorld();
 
 // ---------------------------------------------------------------- views
-function resetView(){camera.position.set(-16,13,16);controls.target.set(6,4,-13);camera.fov=50;camera.updateProjectionMatrix();controls.update();}
-function fullView(){camera.position.set(-380,520,640);controls.target.set(-380,0,-50);controls.update();}
-resetView();
+controls.enabled=false;
+camera.position.set(0,ORIGIN.h||0.002,0);
+camera.lookAt(0,ORIGIN.h||0.002,-1);
 
 // ---------------------------------------------------------------- UI state
 const $=id=>document.getElementById(id);
@@ -448,7 +424,7 @@ let catchEpoch=Date.UTC(2026,10,14,21,20,10);
 function parseCatch(){const m=$('catchInput').value.trim().match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?$/);if(!m)return;
   catchEpoch=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]+6,+m[5],+(m[6]||0));} // CT = UTC-6 (CST)
 $('catchInput').addEventListener('change',parseCatch);
-{const hp=new URLSearchParams(location.hash.slice(1));if(hp.has('t'))t=+hp.get('t');if(hp.get('view')==='full')fullView();}
+{const hp=new URLSearchParams(location.hash.slice(1));if(hp.has('t'))t=+hp.get('t');}
 const fmtCT=ms=>new Date(ms).toLocaleTimeString('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit',second:'2-digit'});
 function fmtT(s){const a=Math.abs(s),m=Math.floor(a/60),ss=Math.floor(a%60);return (s<0?'−':'+')+m+':'+String(ss).padStart(2,'0');}
 function compass(az){return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(az/22.5)%16];}
@@ -457,15 +433,20 @@ $('btnPlay').onclick=()=>{playing=!playing;live=false;$('btnLive').classList.rem
 const RATES=[1,5,20,60];$('btnRate').onclick=()=>{rate=RATES[(RATES.indexOf(rate)+1)%RATES.length];$('btnRate').textContent=rate+'×';};
 $('scrub').oninput=e=>{t=+e.target.value;live=false;$('btnLive').classList.remove('on');};
 $('btnLive').onclick=()=>{live=!live;$('btnLive').classList.toggle('on',live);if(live){playing=false;$('btnPlay').textContent='▶︎ Play';}};
-$('btnReset').onclick=resetView;$('btnFull').onclick=fullView;
-$('btnInfo').onclick=$('approxBadge').onclick=()=>{$('info').style.display='block';};
-$('btnCloseInfo').onclick=()=>{$('info').style.display='none';};
+function openInfo(){$('infoScrim').hidden=false;}
+function closeInfo(){$('infoScrim').hidden=true;}
+$('btnInfo').onclick=e=>{e.stopPropagation();openInfo();};
+$('btnCloseInfo').onclick=e=>{e.stopPropagation();closeInfo();};
+$('info').onclick=e=>e.stopPropagation();
+$('infoScrim').onclick=e=>{if(e.target===$('infoScrim'))closeInfo();};
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeInfo();$('alignpop').hidden=true;}});
+$('btnAlignMenu').onclick=e=>{e.stopPropagation();$('alignpop').hidden=!$('alignpop').hidden;};
 function toast(s,ms=3500){const m=$('msg');m.textContent=s;m.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>m.style.display='none',ms);}
 let gpsWatchId=null, gpsEst=null, gpsBuilt=null;
 function stopGps(){if(gpsWatchId!=null&&navigator.geolocation){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}}
 function applyGps(lat,lon,acc,rebuild){
   setOrigin({lat,lon,h:0.002,label:'GPS ±'+Math.round(acc)+' m'});
-  if(rebuild){buildWorld();if(!arMode)resetView();gpsBuilt={lat,lon};}
+  if(rebuild){buildWorld();camera.position.set(0,0.002,0);gpsBuilt={lat,lon};}
   const d=enuDist(SITES.rro);
   $('viewerTxt').textContent=`GPS ±${Math.round(acc)} m (${d.toFixed(1)} km from Outpost)`;
   $('rGps').textContent=`±${Math.round(acc)} m`;
@@ -487,7 +468,7 @@ $('btnGPS').onclick=()=>{if(!navigator.geolocation)return toast('No geolocation 
     if(!gpsEst){$('rGps').textContent='Outpost';}
   },{enableHighAccuracy:true,maximumAge:0,timeout:60000});
   toast('Watching GPS (high accuracy)…');};
-$('btnRRO').onclick=()=>{stopGps();gpsEst=null;gpsBuilt=null;setOrigin({...SITES.rro,h:0.002,label:'Rocket Ranch Outpost (approx.)'});buildWorld();if(!arMode)resetView();$('viewerTxt').textContent='';$('rGps').textContent='Outpost';};
+$('btnRRO').onclick=()=>{stopGps();gpsEst=null;gpsBuilt=null;setOrigin({...SITES.rro,h:0.002,label:'Rocket Ranch Outpost (approx.)'});buildWorld();camera.position.set(0,0.002,0);$('viewerTxt').textContent='';$('rGps').textContent='Outpost';};
 function enuDist(s){const v=enu(s.lat,s.lon,0);return Math.hypot(v.x,v.z);}
 
 // ---------------------------------------------------------------- AR (camera passthrough + compass) & WebXR
@@ -536,9 +517,8 @@ function towerAz(){return lookOf(SITES.tower.lat,SITES.tower.lon,CATCH_H).az;}
 function towerEl(){return lookOf(SITES.tower.lat,SITES.tower.lon,CATCH_H).el;}
 function nudge(dh,dp){ if(arMode==='xr'&&dh){world.rotation.y+=dh*D2R;return;} manualOffset+=dh; pitchOffset+=dp; saveTune(); }
 $('btnAlign').onclick=()=>{
-  if(arMode==='pass'){manualOffset+=camAz(camera)-towerAz(); pitchOffset+=towerEl()-camEl(camera); saveTune(); toast('Aligned: Pad 1 tower is on the reticle');}
-  else if(arMode==='xr'){alignXR(towerAz());}
-  else {controls.target.copy(enu(SITES.tower.lat,SITES.tower.lon,CATCH_H));controls.update();toast('Looking at the Pad 1 tower');}};
+  if(arMode==='xr'){alignXR(towerAz());return;}
+  manualOffset+=camAz(camera)-towerAz(); pitchOffset+=towerEl()-camEl(camera); saveTune(); toast('Aligned: Pad 1 tower is on the reticle');};
 $('btnL5').onclick=()=>nudge(0.5,0);
 $('btnL').onclick=()=>nudge(2,0);
 $('btnR').onclick=()=>nudge(-2,0);
@@ -546,10 +526,10 @@ $('btnR5').onclick=()=>nudge(-0.5,0);
 $('btnPup').onclick=()=>nudge(0,0.5);
 $('btnPdn').onclick=()=>nudge(0,-0.5);
 
-function setArVisuals(on){ groundGroup.visible=!on; scene.background=on?null:SKY;
-  const line=pathGroup.getObjectByName('line'); if(line)line.material.linewidth=on?6:2.5;
-  const tube=pathGroup.getObjectByName('tube'); if(tube)tube.visible=!on;
-  document.body.classList.toggle('ar',on); $('btnAR').classList.toggle('on',on); $('btnAR').textContent=on?'Exit AR':'AR'; }
+function setArVisuals(videoOn){ groundGroup.visible=false; scene.background=videoOn?null:SKY;
+  const line=pathGroup.getObjectByName('line'); if(line)line.material.linewidth=6;
+  const tube=pathGroup.getObjectByName('tube'); if(tube)tube.visible=false;
+  document.body.classList.add('ar'); }
 
 async function startAR(){
   // iOS motion permission must be requested synchronously inside the tap
@@ -564,17 +544,16 @@ async function startAR(){
   catch(e){toast('Camera unavailable ('+e.name+') – showing sensor-only AR over black.',5000);}
   window.addEventListener('deviceorientation',onOri,true);
   if('ondeviceorientationabsolute' in window)window.addEventListener('deviceorientationabsolute',onAbs,true);
-  arMode='pass'; controls.enabled=false; camera.position.set(0,ORIGIN.h||0.002,0); setArVisuals(true);
+  arMode='pass'; controls.enabled=false; camera.position.set(0,ORIGIN.h||0.002,0); setArVisuals(!!video.srcObject);
   video.onloadedmetadata=updateArFov; updateArFov();
   qReady=false;
-  toast('Hold the phone up. Point the reticle at the Pad 1 tower and tap "Align to tower".',6000);
 }
-function stopAR(){
-  if(arMode==='xr'){const s=renderer.xr.getSession();if(s)s.end();return;}
-  window.removeEventListener('deviceorientation',onOri,true);window.removeEventListener('deviceorientationabsolute',onAbs,true);
-  const st=video.srcObject;if(st)st.getTracks().forEach(tr=>tr.stop());video.srcObject=null;video.style.display='none';
-  arMode=null;controls.enabled=true;setArVisuals(false);resetView(); }
-$('btnAR').onclick=()=>{arMode?stopAR():startAR();};
+function beginPhone(){
+  const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function');
+  if(ios){$('start').hidden=false;return;}
+  startAR();
+}
+if(PHONE){beginPhone();$('btnStart').onclick=()=>{$('start').hidden=true;startAR();};}
 
 // WebXR (Android): world in metres, yaw aligned from absolute compass if available, else "Align to tower"
 let xrNeedsYaw=false;
@@ -584,7 +563,7 @@ async function startXR(){
   renderer.xr.enabled=true; renderer.xr.setReferenceSpaceType('local'); camera.near=0.5; camera.far=2e6; camera.updateProjectionMatrix();
   world.scale.setScalar(1000); world.position.set(0,-1.5,0); world.rotation.set(0,0,0);
   await renderer.xr.setSession(session); arMode='xr'; xrNeedsYaw=true; setArVisuals(true);
-  session.addEventListener('end',()=>{renderer.xr.enabled=false;world.scale.setScalar(1);world.position.set(0,0,0);world.rotation.set(0,0,0);camera.near=0.005;camera.far=30000;camera.updateProjectionMatrix();arMode=null;setArVisuals(false);resetView();window.removeEventListener('deviceorientationabsolute',onAbs,true);});
+  session.addEventListener('end',()=>{renderer.xr.enabled=false;world.scale.setScalar(1);world.position.set(0,0,0);world.rotation.set(0,0,0);camera.near=0.005;camera.far=30000;camera.updateProjectionMatrix();arMode='pass';camera.position.set(0,ORIGIN.h||0.002,0);setArVisuals(false);window.removeEventListener('deviceorientationabsolute',onAbs,true);});
   toast('If the path looks rotated, point at the Pad 1 tower and tap "Align to tower".',6000);
 }
 function alignXR(targetAz){const xc=renderer.xr.getCamera();const d=new THREE.Vector3(0,0,-1).applyQuaternion(xc.getWorldQuaternion(new THREE.Quaternion()));
@@ -627,7 +606,7 @@ function frame(now){
   const tc=Math.min(T1,Math.max(T0,t)); $('scrub').value=tc;
   const s=sampleAt(tc); enu(s.lat,s.lon,s.h,shipPos); shipObj.position.copy(shipPos);
   // desktop: keep ship sphere visible at any zoom
-  const cd=camera.position.distanceTo(shipPos)/(world.scale.x||1); shipObj.children[2].scale.setScalar(Math.max(0.3,cd*0.004)); shipObj.children[2].visible=!arMode;
+  shipObj.children[2].visible=false;
   // readouts (from viewer at origin)
   const hz=Math.hypot(shipPos.x,shipPos.z), el=Math.atan2(shipPos.y-(ORIGIN.h||0.002),hz)*R2D, az=(Math.atan2(shipPos.x,-shipPos.z)*R2D+360)%360, rng=shipPos.length();
   const mach=s.v/soundSpeed(s.h);
@@ -650,7 +629,7 @@ function frame(now){
     $('calhint').style.display=poor?'block':'none';
   } else $('calhint').style.display='none';
   if(arMode==='xr'&&xrNeedsYaw&&absOri&&lastCompass!=null){const xc=renderer.xr.getCamera();if(xc){xrNeedsYaw=false;alignXR(lastCompass);}}
-  if(!arMode)controls.update();
+  if(arMode!=='pass'&&arMode!=='xr')camera.position.set(0,ORIGIN.h||0.002,0);
   const cam=arMode==='xr'?renderer.xr.getCamera():camera;
   world.updateMatrixWorld(true); cam.updateMatrixWorld(true);
   const shipW=shipObj.getWorldPosition(tgtWorld.clone()), towerW=enu(SITES.tower.lat,SITES.tower.lon,CATCH_H).applyMatrix4(world.matrixWorld);
@@ -668,8 +647,7 @@ function fmtHMS(x){x=Math.max(0,x);const h=Math.floor(x/3600),m=Math.floor(x%360
 renderer.setAnimationLoop(frame);
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
   const line=pathGroup.getObjectByName('line');if(line)line.material.resolution.set(innerWidth,innerHeight);updateArFov();});
-window.__f15={SAMPLES,sampleAt,EVENTS};
-if(!window.isSecureContext)setTimeout(()=>toast('Opened without HTTPS: 3D view works; AR (camera/compass) needs HTTPS.',5000),800);
+window.__f15={SAMPLES,sampleAt,EVENTS,phone:PHONE};
 </script>
 </body>
 </html>
